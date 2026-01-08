@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <div class="position-relative d-inline-block">
+                        {% if current_user.profile_image and current_user.profile_image != 'default_avatar.png' %}
+                        <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_image) }}"
+                            class="rounded-circle object-fit-cover shadow-sm" width="120" height="120"
+                            alt="Foto de Perfil">
+                        {% else %}
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                            style="width: 120px; height: 120px;">
+                            <i class="bi bi-person fs-1"></i>
+                        </div>
+                        {% endif %}
+                        <button
+                            class="btn btn-sm btn-dark rounded-circle position-absolute bottom-0 end-0 border-white border-2"
+                            onclick="document.getElementById('profile_image').click()" title="Alterar Foto">
+                            <i class="bi bi-camera"></i>
+                        </button>
+                    </div>
+                    <h4 class="fw-bold mt-3">{{ current_user.username }}</h4>
+                    <p class="text-muted">{{ current_user.email }}</p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <!-- Hidden file input triggered by camera button -->
+                    <input type="file" id="profile_image" name="profile_image" class="d-none" accept="image/*"
+                        onchange="form.submit()">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Nome Completo</label>
+                        <input type="text" name="full_name" class="form-control bg-light border-0"
+                            value="{{ current_user.full_name or '' }}">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Contato (Tel/Cel)</label>
+                        <input type="text" name="contact" class="form-control bg-light border-0"
+                            value="{{ current_user.contact or '' }}">
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

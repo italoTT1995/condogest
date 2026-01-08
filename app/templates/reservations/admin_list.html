@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Gerenciar Reservas (Admin)</h2>
+
+<div class="table-responsive mt-4">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Morador</th>
+                <th>Unidade</th>
+                <th>Área</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for res in reservations %}
+            <tr>
+                <td>{{ res.resident.username }}</td>
+                <td>{{ res.resident.unit.block }}-{{ res.resident.unit.number if res.resident.unit else '?' }}</td>
+                <td>
+                    {% if res.area %}
+                    {{ res.area.name }}
+                    {% else %}
+                    <span class="text-danger">Área Removida</span>
+                    {% endif %}
+                </td>
+                <td>{{ res.date.strftime('%d/%m/%Y') }}</td>
+                <td>{{ res.start_time.strftime('%H:%M') }} - {{ res.end_time.strftime('%H:%M') }}</td>
+                <td>
+                    {% if res.status == 'approved' %}
+                    <span class="badge bg-success">Aprovado</span>
+                    {% elif res.status == 'rejected' %}
+                    <span class="badge bg-danger">Rejeitado</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">Pendente</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if res.status != 'approved' %}
+                    <form action="{{ url_for('reservations.approve_reservation', id=res.id) }}" method="post"
+                        class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button type="submit" class="btn btn-sm btn-success" title="Aprovar"><i
+                                class="bi bi-check-lg"></i></button>
+                    </form>
+                    {% endif %}
+
+                    {% if res.status != 'rejected' %}
+                    <form action="{{ url_for('reservations.reject_reservation', id=res.id) }}" method="post"
+                        class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button type="submit" class="btn btn-sm btn-warning" title="Rejeitar"><i
+                                class="bi bi-x-lg"></i></button>
+                    </form>
+                    {% endif %}
+
+                    <form action="{{ url_for('reservations.delete_reservation', id=res.id) }}" method="post"
+                        class="d-inline"
+                        onsubmit="return confirm('Tem certeza que deseja excluir esta reserva permanentemente?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir"><i
+                                class="bi bi-trash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="text-center">Nenhuma reserva encontrada.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

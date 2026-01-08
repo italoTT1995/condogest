@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h4 class="fw-bold mb-0">Nova Unidade</h4>
+                <p class="text-muted small">Adicione um novo apartamento ou casa ao sistema.</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="block" class="form-label fw-bold small text-uppercase text-muted">Bloco</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="block"
+                                name="block" placeholder="Ex: A" required>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="number"
+                                class="form-label fw-bold small text-uppercase text-muted">Número</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="number"
+                                name="number" placeholder="Ex: 101" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin.dashboard') }}"
+                            class="btn btn-light rounded-pill fw-bold text-muted px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold px-5">Cadastrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

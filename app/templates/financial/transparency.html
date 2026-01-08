@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Portal da Transparência</h2>
+        <p class="text-muted mb-0">Confira para onde vai o dinheiro do condomínio.</p>
+    </div>
+    {% if current_user.is_admin %}
+    <div class="col-auto">
+        <a href="{{ url_for('financial.new_expense') }}" class="btn btn-primary rounded-pill fw-bold shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Nova Despesa
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-primary text-white">
+            <div class="card-body p-4 position-relative overflow-hidden">
+                <h6 class="text-uppercase opacity-75 mb-2">Total de Despesas (Últimos Registros)</h6>
+                <h2 class="display-4 fw-bold mb-0">R$ {{ "%.2f"|format(total_spent) }}</h2>
+                <i class="bi bi-graph-down-arrow position-absolute bottom-0 end-0 opacity-25"
+                    style="font-size: 8rem; transform: translate(20%, 20%);"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Chart -->
+    <div class="col-lg-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-4">Distribuição de Gastos</h5>
+                <canvas id="expensesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- List -->
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3 border-0 text-muted small text-uppercase">Data</th>
+                                <th class="py-3 border-0 text-muted small text-uppercase">Descrição</th>
+                                <th class="py-3 border-0 text-muted small text-uppercase">Categoria</th>
+                                <th class="py-3 border-0 text-muted small text-uppercase">Valor</th>
+                                <th class="pe-4 py-3 border-0 text-muted small text-uppercase text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                            <tr>
+                                <td class="ps-4 text-nowrap">{{ expense.date_incurred.strftime('%d/%m/%Y') }}</td>
+                                <td class="fw-bold text-dark">{{ expense.description }}</td>
+                                <td>
+                                    <span class="badge bg-light text-dark border rounded-pill">{{ expense.category
+                                        }}</span>
+                                </td>
+                                <td class="fw-bold text-danger">- R$ {{ "%.2f"|format(expense.amount) }}</td>
+                                <td class="pe-4 text-end">
+                                    {% if expense.proof_filename %}
+                                    <a href="{{ url_for('static', filename='uploads/receipts/' + expense.proof_filename) }}"
+                                        target="_blank" class="btn btn-sm btn-light rounded-pill"
+                                        title="Ver Comprovante">
+                                        <i class="bi bi-receipt"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if current_user.is_admin %}
+                                    <form action="{{ url_for('financial.delete_expense', id=expense.id) }}"
+                                        method="post" class="d-inline"
+                                        onsubmit="return confirm('Apagar este registro?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit"
+                                            class="btn btn-sm btn-outline-danger border-0 rounded-circle">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    Nenhuma despesa registrada recentemente.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('expensesChart').getContext('2d');
+    const categories = {{ categories | tojson }};
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(categories),
+            datasets: [{
+                data: Object.values(categories),
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

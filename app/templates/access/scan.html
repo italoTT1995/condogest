@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-lg rounded-4 text-center">
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center"
+                        style="width: 80px; height: 80px;">
+                        <i class="bi bi-qr-code-scan fs-1 text-primary"></i>
+                    </div>
+                </div>
+
+                <h3 class="fw-bold mb-3">Validador de Crachá</h3>
+                <p class="text-muted mb-4">Escaneie o Crachá Digital do morador.</p>
+
+                <!-- Camera Container -->
+                <div id="reader" class="mb-4 rounded-4 overflow-hidden" style="width: 100%; display: none;"></div>
+
+                <!-- Manual Input -->
+                <form action="{{ url_for('access.verify') }}" method="get" id="manualForm">
+                    <div class="input-group mb-3">
+                        <input type="text" name="token" id="tokenInput"
+                            class="form-control form-control-lg text-center fw-bold" placeholder="Digitar Token..."
+                            autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold">Verificar
+                        Acesso</button>
+                </form>
+
+                <hr class="my-4">
+                <button id="startScanBtn" class="btn btn-outline-dark w-100 rounded-pill py-2">
+                    <i class="bi bi-camera me-2"></i> Ativar Câmera
+                </button>
+                <button id="stopScanBtn" class="btn btn-outline-danger w-100 rounded-pill py-2" style="display: none;">
+                    <i class="bi bi-stop-circle me-2"></i> Parar Câmera
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+    const html5QrCode = new Html5Qrcode("reader");
+    const startBtn = document.getElementById('startScanBtn');
+    const stopBtn = document.getElementById('stopScanBtn');
+    const readerDiv = document.getElementById('reader');
+
+    startBtn.addEventListener('click', () => {
+        readerDiv.style.display = 'block';
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'block';
+
+        html5QrCode.start(
+            { facingMode: "environment" }, // Use back camera if available
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 250 }
+            },
+            (decodedText, decodedResult) => {
+                // Success callback
+                html5QrCode.stop().then(() => {
+                    // Redirect to verify
+                    window.location.href = "{{ url_for('access.verify') }}?token=" + decodedText;
+                }).catch(err => {
+                    console.error("Failed to stop scanning", err);
+                });
+            },
+            (errorMessage) => {
+                // Parse error, ignore
+            }
+        ).catch(err => {
+            console.error("Unable to start scanning", err);
+            if (err.name === "NotFoundError" || err.toString().includes("NotFoundError")) {
+                alert("Erro: Nenhuma câmera encontrada. \nPor favor, conecte uma webcam ou acesse pelo celular.");
+            } else if (err.name === "NotAllowedError" || err.toString().includes("NotAllowedError")) {
+                alert("Erro: Permissão de câmera negada. \nPor favor, permita o acesso à câmera no seu navegador.");
+            } else {
+                alert("Erro ao acessar câmera: " + err);
+            }
+            resetUI();
+        });
+    });
+
+    stopBtn.addEventListener('click', () => {
+        html5QrCode.stop().then(() => {
+            resetUI();
+        }).catch(err => {
+            console.error("Failed to stop scanning", err);
+        });
+    });
+
+    function resetUI() {
+        readerDiv.style.display = 'none';
+        startBtn.style.display = 'block';
+        stopBtn.style.display = 'none';
+    }
+</script>
+{% endblock %}

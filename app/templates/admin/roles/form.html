@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h4 class="fw-bold mb-0">{{ title }}</h4>
+                <p class="text-muted small">Preencha os dados da função.</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="mb-4">
+                        <label for="name" class="form-label fw-bold small text-uppercase text-muted">Nome da
+                            Função</label>
+                        <input type="text" class="form-control form-control-lg bg-light border-0" id="name" name="name"
+                            value="{{ role.name if role else '' }}" required placeholder="Ex: Porteiro">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="description"
+                            class="form-label fw-bold small text-uppercase text-muted">Descrição</label>
+                        <textarea class="form-control bg-light border-0" id="description" name="description" rows="3"
+                            placeholder="Breve descrição das responsabilidades...">{{ role.description if role else '' }}</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Permissões de Acesso</label>
+
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="is_admin" name="is_admin" {% if role and
+                                role.is_admin %}checked{% endif %}>
+                            <label class="form-check-label" for="is_admin">
+                                <strong>Acesso Total (Admin)</strong> - Pode gerenciar usuários, financeiro e
+                                configurações.
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="can_manage_concierge"
+                                name="can_manage_concierge" {% if role and role.can_manage_concierge %}checked{% endif
+                                %}>
+                            <label class="form-check-label" for="can_manage_concierge">
+                                <strong>Gerenciar Portaria</strong> - Pode registrar visitas, encomendas e ver histórico
+                                de acessos.
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="can_manage_reservations"
+                                name="can_manage_reservations" {% if role and role.can_manage_reservations %}checked{%
+                                endif %}>
+                            <label class="form-check-label" for="can_manage_reservations">
+                                <strong>Gerenciar Reservas</strong> - Pode aprovar/rejeitar reservas de áreas comuns.
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('roles.index') }}"
+                            class="btn btn-light rounded-pill fw-bold text-muted px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold px-5">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

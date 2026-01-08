@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Welcome / Hero Section -->
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark">Olá, {{ current_user.username }} 👋</h2>
+        <p class="text-muted">Bem-vindo ao seu painel de gerenciamento.</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <div class="d-inline-flex align-items-center gap-2">
+            <span class="text-muted small">{{ current_time }}</span> <!-- You might need to pass this or just omit -->
+
+        </div>
+    </div>
+</div>
+
+<!-- Stats Row (Small Cards) -->
+<div class="row g-4 mb-5">
+    <!-- Ticket Stat -->
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                    <span class="fs-4">🎫</span>
+                </div>
+                <div>
+                    <h5 class="card-title fw-bold mb-0">{{ chart_data.open }}</h5>
+                    <small class="text-muted">Chamados Abertos</small>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 rounded-bottom-4">
+                <a href="{{ url_for('tickets.index') }}" class="text-decoration-none small fw-bold">Ver todos →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Finance Stat -->
+    {% if not current_user.is_porteiro %}
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-warning bg-opacity-10 p-3 rounded-circle me-3">
+                    <span class="fs-4">💰</span>
+                </div>
+                <div>
+                    {% if current_user.is_admin %}
+                    <h5 class="card-title fw-bold mb-0">{{ payment_stats.pending_count }}</h5>
+                    <small class="text-muted">Pgts Pendentes</small>
+                    {% else %}
+                    <h5 class="card-title fw-bold mb-0">R$ {{ "%.0f"|format(payment_amount) }}</h5>
+                    <small class="text-muted">A Pagar</small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 rounded-bottom-4">
+                <a href="{{ url_for('payments.index') }}" class="text-decoration-none small fw-bold">Financeiro →</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Visitor Stat (Admin/Porteiro/Sindico) -->
+    {% if visitor_stats %}
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle me-3">
+                    <span class="fs-4">👥</span>
+                </div>
+                <div>
+                    <h5 class="card-title fw-bold mb-0">{{ visitor_stats.active }}</h5>
+                    <small class="text-muted">Visitantes Ativos</small>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 rounded-bottom-4">
+                <a href="{{ url_for('visitors.index') }}" class="text-decoration-none small fw-bold">Portaria →</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Notices Stat/Recent -->
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3">
+                    <span class="fs-4">📢</span>
+                </div>
+                <div>
+                    <h5 class="card-title fw-bold mb-0">{{ notices|length }}</h5>
+                    <small class="text-muted">Novos Avisos</small>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 rounded-bottom-4">
+                <a href="{{ url_for('notices.index') }}" class="text-decoration-none small fw-bold">Ler avisos →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Area: Charts & Detailed Lists -->
+<div class="row g-4 mb-4">
+    <!-- Left Column: Big Charts -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Visão Geral</h5>
+                <small class="text-muted">Estatísticas Mensais</small>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <!-- Tabs for Charts (Optional, using simple stacking for now) -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-muted small text-uppercase fw-bold mb-3">Chamados</h6>
+                        <div style="height: 250px;">
+                            <canvas id="ticketsChart"></canvas>
+                        </div>
+                    </div>
+                    {% if not current_user.is_porteiro %}
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-muted small text-uppercase fw-bold mb-3">Financeiro</h6>
+                        <div style="height: 250px;">
+                            <canvas id="paymentsChart"></canvas>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if visitor_stats %}
+                <hr class="text-muted text-opacity-25 my-4">
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="text-muted small text-uppercase fw-bold mb-3">Fluxo de Visitantes (7 Dias)</h6>
+                        <div style="height: 250px;">
+                            <canvas id="visitorsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if not current_user.is_porteiro %}
+        <!-- Action Banner (Like "Rent Received") -->
+        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white overflow-hidden position-relative">
+            <div class="card-body p-5 position-relative z-2">
+                <h3 class="fw-bold mb-2">Precisa de algo?</h3>
+                <p class="mb-4 text-white-50" style="max-width: 400px;">Abra um novo chamado ou verifique seus
+                    pagamentos pendentes com facilidade.</p>
+                <a href="{{ url_for('tickets.create') }}" class="btn btn-light rounded-pill px-4 fw-bold">Novo
+                    Chamado</a>
+            </div>
+            <div class="position-absolute rounded-circle bg-white opacity-10"
+                style="width: 300px; height: 300px; top: -50px; right: -50px;"></div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Notices/Side Widgets -->
+    <div class="col-lg-4">
+        <!-- Notices List -->
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Comunicados</h5>
+                <a href="{{ url_for('notices.index') }}" class="small text-decoration-none">Ver tudo</a>
+            </div>
+            <div class="card-body px-0">
+                <div class="list-group list-group-flush">
+                    {% for notice in notices %}
+                    <div class="list-group-item border-0 px-4 py-3">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0 fw-bold text-dark text-truncate" style="max-width: 180px;">{{ notice.title
+                                }}</h6>
+                            <small class="text-muted text-nowrap ms-2" style="font-size: 0.75rem;">{{
+                                notice.created_at.strftime('%d/%m') }}</small>
+                        </div>
+                        <p class="mb-1 text-muted small text-truncate" style="max-width: 250px;">Clique para ler os
+                            detalhes deste comunicado.</p>
+                    </div>
+                    {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <small>Sem comunicados recentes.</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const commonOptions = {
+        indexAxis: 'y', // Horizontal bars
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        },
+        maintainAspectRatio: false,
+        scales: {
+            x: { beginAtZero: true, grid: { display: false } },
+            y: { grid: { display: false } }
+        }
+    };
+
+    const ctxTickets = document.getElementById('ticketsChart').getContext('2d');
+    new Chart(ctxTickets, {
+        type: 'bar',
+        data: {
+            labels: ['Aberto', 'Andamento', 'Concluído'],
+            datasets: [{
+                data: [{{ chart_data.open }}, {{ chart_data.progress }}, {{ chart_data.closed }}],
+        backgroundColor: ['#dc3545', '#ffc107', '#198754'],
+        borderWidth: 1,
+        barPercentage: 0.6
+            }]
+        },
+        options: commonOptions
+    });
+
+    {% if not current_user.is_porteiro %}
+    const ctxPayments = document.getElementById('paymentsChart').getContext('2d');
+    new Chart(ctxPayments, {
+        type: 'bar',
+        data: {
+            labels: ['Pendente', 'Pago'],
+            datasets: [{
+                data: [{{ payment_stats.pending_count }}, {{ payment_stats.paid_count }}],
+        backgroundColor: ['#fd7e14', '#20c997'],
+        borderWidth: 1,
+        barPercentage: 0.6
+    }]
+        },
+        options: commonOptions
+    });
+    {% endif %}
+
+    {% if visitor_stats %}
+    const ctxVisitors = document.getElementById('visitorsChart').getContext('2d');
+    new Chart(ctxVisitors, {
+        type: 'line',
+        data: {
+            labels: {{ visitor_stats.labels | tojson }},
+        datasets: [{
+            label: 'Visitas',
+            data: {{ visitor_stats.data | tojson }},
+        borderColor: '#0d6efd',
+        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 4,
+        pointBackgroundColor: '#fff',
+        pointBorderColor: '#0d6efd',
+        pointBorderWidth: 2
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+            x: { grid: { display: false } }
+        }
+    }
+    });
+    {% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Controle de Encomendas</h2>
+        <p class="text-muted">Gerencie o recebimento e entrega de pacotes.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('deliveries.new') }}" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
+            <i class="bi bi-box-seam me-1"></i> Nova Encomenda
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white border-0 pt-4 px-4">
+        <h5 class="fw-bold mb-0">Pendentes de Retirada</h5>
+    </div>
+    <div class="card-body px-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 text-muted small text-uppercase font-monospace border-0">Unidade</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0">Descrição</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0">Foto</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0">Chegada</th>
+                        <th class="text-end pe-4 text-muted small text-uppercase font-monospace border-0">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for delivery in deliveries %}
+                    <tr>
+                        <td class="ps-4">
+                            <span
+                                class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2 rounded-pill">
+                                BL {{ delivery.unit.block }} - AP {{ delivery.unit.number }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-dark d-block">{{ delivery.description }}</span>
+                            {% if delivery.recipient_label %}
+                            <small class="text-muted d-block"><i class="bi bi-person me-1"></i>{{
+                                delivery.recipient_label }}</small>
+                            {% endif %}
+                            {% if delivery.storage_location %}
+                            <span
+                                class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary rounded-pill mt-1">
+                                <i class="bi bi-geo-alt me-1"></i>{{ delivery.storage_location }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if delivery.image_filename %}
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#imgModal{{ delivery.id }}">
+                                <i class="bi bi-image fs-5 text-secondary"></i>
+                            </a>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="imgModal{{ delivery.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-body p-0">
+                                            <img src="{{ url_for('static', filename='uploads/deliveries/' + delivery.image_filename) }}"
+                                                class="img-fluid w-100 rounded">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">
+                            {{ delivery.received_at.strftime('%d/%m %H:%M') }}
+                        </td>
+                        <td class="text-end pe-4">
+                            <form action="{{ url_for('deliveries.pickup', id=delivery.id) }}" method="post"
+                                class="d-inline-flex align-items-center gap-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <input type="text" name="recipient_name"
+                                    class="form-control form-control-sm bg-light border-0" placeholder="Quem retirou?"
+                                    style="width: 150px;">
+                                <button type="submit" class="btn btn-sm btn-outline-success rounded-pill fw-bold"
+                                    title="Confirmar Retirada">
+                                    <i class="bi bi-check-lg"></i> Baixa
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-box2 fs-1 d-block mb-3 opacity-25"></i>
+                            Nenhuma encomenda pendente.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

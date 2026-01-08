@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h4 class="fw-bold mb-0">Novo Chamado</h4>
+                <p class="text-muted small">Descreva o problema ou solicitação abaixo.</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    {% if is_complaint %}
+                    <input type="hidden" name="category" value="complaint">
+                    <div class="alert alert-warning border-0 d-flex align-items-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                        <div>
+                            <strong>Denúncia Anônima?</strong><br>
+                            <span class="small">Seu nome aparecerá apenas para a Administração.</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <label for="title" class="form-label fw-bold small text-uppercase text-muted">
+                            {{ 'Assunto da Denúncia' if is_complaint else 'Título' }}
+                        </label>
+                        <input type="text" class="form-control form-control-lg bg-light border-0" id="title"
+                            name="title" required placeholder="Ex: Vazamento na pia">
+                    </div>
+                    <div class="mb-4">
+                        <label for="description" class="form-label fw-bold small text-uppercase text-muted">Descrição
+                            Detalhada</label>
+                        <textarea class="form-control bg-light border-0" id="description" name="description" rows="5"
+                            required placeholder="Forneça mais detalhes sobre a solicitação..."></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="image" class="form-label fw-bold small text-uppercase text-muted">Foto
+                            (Opcional)</label>
+                        <input type="file" class="form-control bg-light border-0" id="image" name="image"
+                            accept="image/*">
+                        <div class="form-text">Formatos aceitos: JPG, PNG, GIF (Máx. 16MB)</div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('tickets.index') }}"
+                            class="btn btn-light rounded-pill fw-bold text-muted px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold px-4">Criar Chamado</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

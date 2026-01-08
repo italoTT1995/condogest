@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Visualização de Boleto Bancário</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h3>BOLETO DE EXEMPLO</h3>
+                        <p class="text-muted">Este é um boleto demonstrativo gerado pelo sistema.</p>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <strong>Beneficiário:</strong><br>
+                            Condomínio Manager System<br>
+                            CNPJ: 00.000.000/0001-00
+                        </div>
+                        <div class="col-6 text-end">
+                            <strong>Pagador:</strong><br>
+                            {{ payment.user.username }}<br>
+                            Unidade: {{ payment.user.unit.block }} - {{ payment.user.unit.number }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 bg-light p-3 border rounded">
+                        <div class="col-4">
+                            <small class="text-muted">Vencimento</small><br>
+                            <strong>{{ payment.due_date.strftime('%d/%m/%Y') }}</strong>
+                        </div>
+                        <div class="col-4 text-center">
+                            <small class="text-muted">Valor</small><br>
+                            <h4 class="text-primary">R$ {{ "%.2f"|format(payment.amount) }}</h4>
+                        </div>
+                        <div class="col-4 text-end">
+                            <small class="text-muted">Nosso Número</small><br>
+                            123456789-0
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-5 mb-4">
+                        <div class="p-3 border bg-white d-inline-block">
+                            <!-- Barcode Placeholder -->
+                            <div
+                                style="background: repeating-linear-gradient(90deg,#000,#000 1px,#fff 0,#fff 5px); width: 100%; height: 50px;">
+                            </div>
+                            <small class="d-block mt-2">23790.12345 60000.123456 70000.123456 8 876500000{{
+                                "%.0f"|format(payment.amount) }}</small>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button class="btn btn-secondary me-md-2" onclick="window.print()">Imprimir</button>
+                        <a href="{{ url_for('payments.index') }}" class="btn btn-primary">Voltar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

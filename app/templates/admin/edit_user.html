@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h4 class="fw-bold mb-0">Editar Usuário</h4>
+                <p class="text-muted small">Atualize as informações de <strong>{{ user.username }}</strong>.</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="username" class="form-label fw-bold small text-uppercase text-muted">Nome de
+                                Usuário</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="username"
+                                name="username" value="{{ user.username }}" required>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="email" class="form-label fw-bold small text-uppercase text-muted">Email</label>
+                            <input type="email" class="form-control form-control-lg bg-light border-0" id="email"
+                                name="email" value="{{ user.email }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="cpf" class="form-label fw-bold small text-uppercase text-muted">CPF</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="cpf"
+                                name="cpf" value="{{ user.cpf or '' }}" placeholder="000.000.000-00">
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="password" class="form-label fw-bold small text-uppercase text-muted">Nova
+                                Senha</label>
+                            <input type="password" class="form-control form-control-lg bg-light border-0" id="password"
+                                name="password" placeholder="Deixe em branco para manter a atual">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="role_id"
+                                class="form-label fw-bold small text-uppercase text-muted">Função</label>
+                            <select class="form-select form-control-lg bg-light border-0" id="role_id" name="role_id"
+                                required>
+                                {% for role in roles %}
+                                <option value="{{ role.id }}" {% if user.role_id==role.id %}selected{% endif %}>{{
+                                    role.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="unit_id"
+                                class="form-label fw-bold small text-uppercase text-muted">Unidade</label>
+                            <select class="form-select form-control-lg bg-light border-0" id="unit_id" name="unit_id">
+                                <option value="">Nenhuma</option>
+                                {% for unit in units %}
+                                <option value="{{ unit.id }}" {% if user.unit_id==unit.id %}selected{% endif %}>{{
+                                    unit.block }} - {{ unit.number }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="form-check form-switch p-3 bg-light rounded-3">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" role="switch"
+                                    id="must_change_password" name="must_change_password" {% if
+                                    user.must_change_password %}checked{% endif %}>
+                                <label class="form-check-label fw-bold small text-uppercase text-muted"
+                                    for="must_change_password">Exigir troca de senha no próximo login</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin.dashboard') }}"
+                            class="btn btn-light rounded-pill fw-bold text-muted px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold px-5">Salvar
+                            Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

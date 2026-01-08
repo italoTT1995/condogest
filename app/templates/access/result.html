@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="col-md-6 text-center">
+        {% if status == 'allowed' %}
+        <div class="card border-0 shadow-lg rounded-4 bg-success text-white mb-4 animate-pop">
+            <div class="card-body p-5">
+                <i class="bi bi-check-circle-fill display-1 mb-3"></i>
+                <h1 class="fw-bold display-4">ACESSO LIBERADO</h1>
+                <p class="fs-4">{{ message }}</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="card border-0 shadow-lg rounded-4 bg-danger text-white mb-4 animate-pop">
+            <div class="card-body p-5">
+                <i class="bi bi-slash-circle-fill display-1 mb-3"></i>
+                <h1 class="fw-bold display-4">BLOQUEADO</h1>
+                <p class="fs-4">{{ message }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if user_data %}
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 text-start d-flex align-items-center">
+                <div class="me-3">
+                    <img src="{{ url_for('static', filename='profile_pics/' + user_data.profile_image) }}"
+                        class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                </div>
+                <div>
+                    <h4 class="fw-bold text-dark mb-1">{{ user_data.full_name }}</h4>
+                    <p class="text-muted mb-0 fs-5">Unidade {{ user_data.unit.block }} - {{ user_data.unit.number }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="mt-4">
+            <a href="{{ url_for('access.scan') }}" class="btn btn-light shadow-sm rounded-pill px-5 fw-bold text-dark">
+                <i class="bi bi-arrow-counterclockwise"></i> Nova Validação
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes pop {
+        0% {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .animate-pop {
+        animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+</style>
+{% endblock %}

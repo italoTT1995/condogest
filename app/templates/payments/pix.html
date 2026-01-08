@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Pagamento via Pix</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
+                            alt="QR Code Pix" style="max-width: 200px;" class="img-fluid border p-2">
+                    </div>
+
+                    <h4 class="text-success mb-3">R$ {{ "%.2f"|format(payment.amount) }}</h4>
+                    <p class="text-muted">Escaneie o QR Code acima para pagar.</p>
+
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control text-center"
+                            value="00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-426614174000520400005303986540510.005802BR5913CondominioMgr6008Brasilia62070503***6304E2CA"
+                            id="pixCode" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyPix()">Copiar</button>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>Cobrança:</strong> {{ payment.description }}<br>
+                        <strong>Vencimento:</strong> {{ payment.due_date.strftime('%d/%m/%Y') }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('payments.index') }}" class="btn btn-primary">Voltar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyPix() {
+        var copyText = document.getElementById("pixCode");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        alert("Código Pix copiado!");
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Condomínios</h2>
+        <p class="text-muted">Gerencie os condomínios cadastrados no sistema.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('condos.create') }}" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Novo Condomínio
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body px-0 py-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 text-muted small text-uppercase font-monospace border-0 py-3">Nome</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Endereço</th>
+                        <th class="text-end pe-4 text-muted small text-uppercase font-monospace border-0 py-3">Ações
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for condo in condos %}
+                    <tr>
+                        <td class="ps-4">
+                            <h6 class="fw-bold text-dark mb-0">{{ condo.name }}</h6>
+                            {% if condo.cnpj %}
+                            <small class="text-muted">CNPJ: {{ condo.cnpj }}</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ condo.address }}</td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group">
+                                <a href="{{ url_for('condos.switch', id=condo.id) }}"
+                                    class="btn btn-sm btn-outline-info rounded-pill fw-bold border-0 bg-light text-info me-1"
+                                    title="Acessar Painel">
+                                    <i class="bi bi-box-arrow-in-right"></i> Acessar
+                                </a>
+                                <a href="{{ url_for('condos.edit', id=condo.id) }}"
+                                    class="btn btn-sm btn-outline-primary rounded-pill fw-bold border-0 bg-light text-primary"
+                                    title="Editar">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

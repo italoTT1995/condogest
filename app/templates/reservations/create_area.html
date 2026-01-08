@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Nova Área Comum</h2>
+<div class="row">
+    <div class="col-md-6">
+        <form method="post" class="mt-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Nome da Área</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Ex: Salão de Festas A"
+                    required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Descrição</label>
+                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="capacity" class="form-label">Capacidade (Pessoas)</label>
+                <input type="number" class="form-control" id="capacity" name="capacity" value="10">
+            </div>
+            <button type="submit" class="btn btn-success">Salvar</button>
+            <a href="{{ url_for('reservations.manage_areas') }}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

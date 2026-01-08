@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Meus Veículos</h2>
+        <p class="text-muted">Gerencie os veículos cadastrados na sua unidade.</p>
+    </div>
+    <div class="col-auto">
+        {% if current_user.is_admin %}
+        <a href="{{ url_for('vehicles.create') }}" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
+            <i class="bi bi-car-front-fill me-1"></i> Novo Veículo
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body px-0 py-0">
+        {% if vehicles %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 text-muted small text-uppercase font-monospace border-0 py-3">Placa</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Modelo</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Cor</th>
+                        {% if current_user.is_admin or current_user.is_porteiro %}
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Proprietário</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Unidade</th>
+                        {% endif %}
+                        {% if current_user.is_admin %}
+                        <th class="text-end pe-4 text-muted small text-uppercase font-monospace border-0 py-3">Ações
+                        </th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for car in vehicles %}
+                    <tr>
+                        <td class="ps-4">
+                            <h6 class="fw-bold text-dark mb-0 font-monospace">{{ car.plate }}</h6>
+                        </td>
+                        <td class="text-muted">{{ car.model }}</td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ car.color }}</span>
+                        </td>
+                        {% if current_user.is_admin or current_user.is_porteiro %}
+                        <td>{{ car.user.username }}</td>
+                        <td>
+                            <small class="text-muted">Bl. {{ car.user.unit.block }} - {{ car.user.unit.number }}</small>
+                        </td>
+                        {% endif %}
+                        {% if current_user.is_admin %}
+                        <td class="text-end pe-4">
+                            <form action="{{ url_for('vehicles.delete', id=car.id) }}" method="POST"
+                                onsubmit="return confirm('Remover este veículo?');" class="d-inline">
+                                <button type="submit"
+                                    class="btn btn-sm btn-outline-danger rounded-circle border-0 bg-light text-danger"
+                                    style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;"
+                                    title="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-5 text-center text-muted">
+            <i class="bi bi-car-front fs-1 d-block mb-3 opacity-25"></i>
+            <p>Nenhum veículo cadastrado.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

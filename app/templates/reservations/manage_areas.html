@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Gerenciar Áreas Comuns</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('reservations.create_area') }}" class="btn btn-sm btn-success">Nova Área</a>
+    </div>
+</div>
+
+<div class="row">
+    {% for area in areas %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <!-- <img src="..." class="card-img-top" alt="..."> -->
+            <div class="card-body">
+                <h5 class="card-title">{{ area.name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Capacidade: {{ area.capacity }} pessoas</h6>
+                <p class="card-text">{{ area.description }}</p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <form action="{{ url_for('reservations.delete_area', id=area.id) }}" method="post"
+                    onsubmit="return confirm('Excluir esta área?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-md-12">
+        <div class="alert alert-info">Nenhuma área comum cadastrada.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

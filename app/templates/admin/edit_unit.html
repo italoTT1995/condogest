@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h4 class="fw-bold mb-0">Editar Unidade</h4>
+                <p class="text-muted small">Bloco {{ unit.block }} - Apartamento {{ unit.number }}</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="block" class="form-label fw-bold small text-uppercase text-muted">Bloco</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="block"
+                                name="block" value="{{ unit.block }}" required>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="number"
+                                class="form-label fw-bold small text-uppercase text-muted">Número</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="number"
+                                name="number" value="{{ unit.number }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="status" class="form-label fw-bold small text-uppercase text-muted">Status</label>
+                        <select class="form-select form-control-lg bg-light border-0" id="status" name="status">
+                            <option value="vacant" {% if unit.status=='vacant' %}selected{% endif %}>Vaga</option>
+                            <option value="occupied" {% if unit.status=='occupied' %}selected{% endif %}>Ocupada
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin.dashboard') }}"
+                            class="btn btn-light rounded-pill fw-bold text-muted px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold px-5">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Residents List Card -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0">Moradores Vinculados</h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for resident in unit.residents %}
+                    <li class="list-group-item px-4 py-3 d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0">{{ resident.username }}</h6>
+                            <small class="text-muted">{{ resident.email }}</small>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item px-4 py-4 text-center text-muted">
+                        <i class="bi bi-people fs-4 d-block mb-2 opacity-25"></i>
+                        Nenhum morador vinculado a esta unidade.
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

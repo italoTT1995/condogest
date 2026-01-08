@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Chamados</h2>
+        <p class="text-muted">Gerencie suas solicitações e acompanhe o status.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('tickets.create') }}" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Novo Chamado
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body px-0 py-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 text-muted small text-uppercase font-monospace border-0 py-3">Data</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Título</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Solicitante</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Status</th>
+                        <th class="text-end pe-4 text-muted small text-uppercase font-monospace border-0 py-3">Ações
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td class="ps-4 text-muted small">
+                            {{ ticket.created_at.strftime('%d/%m/%Y %H:%M') }}
+                        </td>
+                        <td>
+                            <h6 class="fw-bold text-dark mb-0">{{ ticket.title }}</h6>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ ticket.author.username }}</span>
+                        </td>
+                        <td>
+                            {% if ticket.status == 'open' %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">Aberto</span>
+                            {% elif ticket.status == 'in_progress' %}
+                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Em
+                                Andamento</span>
+                            {% else %}
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Concluído</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group">
+                                <!-- View Details -->
+                                <a href="{{ url_for('tickets.details', id=ticket.id) }}"
+                                    class="btn btn-sm btn-outline-primary rounded-pill fw-bold border-0 bg-light text-primary me-1"
+                                    title="Ver Detalhes">
+                                    <i class="bi bi-eye-fill"></i> Detalhes
+                                </a>
+
+                                <!-- Edit -->
+                                {% if not current_user.is_admin and ticket.status == 'open' %}
+                                <a href="{{ url_for('tickets.edit', id=ticket.id) }}"
+                                    class="btn btn-sm btn-outline-secondary rounded-pill fw-bold border-0 bg-light text-secondary me-1"
+                                    title="Editar">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                {% endif %}
+
+                                <!-- Admin Actions -->
+                                {% if current_user.is_admin %}
+                                <form action="{{ url_for('tickets.update_status', id=ticket.id) }}" method="post"
+                                    class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <select name="status"
+                                        class="form-select form-select-sm d-inline w-auto border-0 bg-light fw-bold text-muted"
+                                        style="width: 110px !important; cursor: pointer;" onchange="this.form.submit()">
+                                        <option value="open" {% if ticket.status=='open' %}selected{% endif %}>🔴 Aberto
+                                        </option>
+                                        <option value="in_progress" {% if ticket.status=='in_progress' %}selected{%
+                                            endif %}>🟡 Andamento</option>
+                                        <option value="closed" {% if ticket.status=='closed' %}selected{% endif %}>🟢
+                                            Fechado</option>
+                                    </select>
+                                </form>
+                                <form action="{{ url_for('tickets.delete', id=ticket.id) }}" method="post"
+                                    class="d-inline ms-1" onsubmit="return confirm('Excluir este chamado?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <button type="submit"
+                                        class="btn btn-sm btn-outline-danger rounded-circle border-0 bg-light text-danger"
+                                        style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;"
+                                        title="Excluir">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
+                            Nenhum chamado encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

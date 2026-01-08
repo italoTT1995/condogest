@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Meus Convidados</h2>
+        <p class="text-muted">Pré-autorize a entrada de visitantes para agilizar a portaria.</p>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm" data-bs-toggle="modal"
+            data-bs-target="#newAuthModal">
+            <i class="bi bi-person-plus-fill me-1"></i> Nova Autorização
+        </button>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body px-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 text-muted small text-uppercase font-monospace border-0">Visitante</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0">Data Prevista</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0">Status</th>
+                        <th class="text-end pe-4 text-muted small text-uppercase font-monospace border-0">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visit in scheduled_visits %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">{{ visit.visitor.name }}</h6>
+                                    <small class="text-muted">CPF: {{ visit.visitor.cpf }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="fw-bold">{{ visit.expected_arrival.strftime('%d/%m/%Y') }}</span>
+                            <small class="text-muted d-block">{{ visit.expected_arrival.strftime('%H:%M') }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3">Agendado</span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <form action="{{ url_for('visitors.cancel_visit', id=visit.id) }}" method="post"
+                                class="d-inline" onsubmit="return confirm('Cancelar esta autorização?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit"
+                                    class="btn btn-sm btn-outline-danger rounded-circle border-0 bg-light text-danger w-32 h-32"
+                                    title="Cancelar">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <i class="bi bi-people fs-1 d-block mb-3 opacity-25"></i>
+                            Nenhuma visita agendada.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nova Autorização -->
+<div class="modal fade" id="newAuthModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Autorizar Entrada</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form action="{{ url_for('visitors.pre_authorize') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Nome do Visitante</label>
+                        <input type="text" name="name" class="form-control bg-light border-0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">CPF (Opcional)</label>
+                        <input type="text" name="cpf" class="form-control bg-light border-0">
+                    </div>
+                    <div class="row">
+                        <div class="col-7">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Data</label>
+                                <input type="date" name="date" class="form-control bg-light border-0" required>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Hora</label>
+                                <input type="time" name="time" class="form-control bg-light border-0" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold">Confirmar
+                            Autorização</button>
+                    </div>
+                </form>
+                <div class="mt-3 text-center">
+                    <small class="text-muted">A portaria poderá visualizar esta autorização imediatamente.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

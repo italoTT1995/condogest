@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Taxas e Pagamentos</h2>
+        <p class="text-muted">Histórico financeiro e cobranças pendentes.</p>
+    </div>
+    {% if current_user.is_admin %}
+    <div class="col-auto">
+        <a href="{{ url_for('payments.create') }}" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
+            <i class="bi bi-cash-stack me-1"></i> Lançar Cobrança
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body px-0 py-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 text-muted small text-uppercase font-monospace border-0 py-3">Vencimento</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Descrição</th>
+                        {% if current_user.is_admin %}<th
+                            class="text-muted small text-uppercase font-monospace border-0 py-3">Morador</th>{% endif %}
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Valor</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0 py-3">Status</th>
+                        <th class="text-end pe-4 text-muted small text-uppercase font-monospace border-0 py-3">Ações
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-dark">{{ payment.due_date.strftime('%d/%m') }}</span>
+                                <small class="text-muted">{{ payment.due_date.strftime('%Y') }}</small>
+                            </div>
+                        </td>
+                        <td>{{ payment.description }}</td>
+                        {% if current_user.is_admin %}<td>{{ payment.resident.username }}</td>{% endif %}
+                        <td class="fw-bold">R$ {{ "%.2f"|format(payment.amount) }}</td>
+                        <td>
+                            {% if payment.status == 'pending' %}
+                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Pendente</span>
+                            {% else %}
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Pago</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            {% if payment.status == 'pending' and current_user.is_admin %}
+                            <form action="{{ url_for('payments.pay', id=payment.id) }}" method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit"
+                                    class="btn btn-sm btn-outline-success rounded-pill fw-bold border-0 bg-light text-success me-1">
+                                    <i class="bi bi-check-lg"></i> Pagar
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {% if payment.status == 'pending' and current_user.is_admin %}
+                            <form action="{{ url_for('payments.send_email', id=payment.id) }}" method="post"
+                                class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit"
+                                    class="btn btn-sm btn-outline-secondary rounded-pill fw-bold border-0 bg-light text-secondary me-1"
+                                    title="Enviar Boleto por Email">
+                                    <i class="bi bi-envelope"></i> Email
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {% if payment.status == 'pending' %}
+                            <a href="{{ url_for('payments.boleto', id=payment.id) }}" target="_blank"
+                                class="btn btn-sm btn-outline-primary rounded-pill fw-bold border-0 bg-light me-1"
+                                title="Gerar Boleto">
+                                <i class="bi bi-upc-scan"></i> Boleto
+                            </a>
+                            <a href="{{ url_for('payments.pix', id=payment.id) }}"
+                                class="btn btn-sm btn-outline-primary rounded-pill fw-bold border-0 bg-light me-1"
+                                title="Pagar com Pix">
+                                <i class="bi bi-qr-code"></i> Pix
+                            </a>
+                            {% endif %}
+
+                            {% if current_user.is_admin %}
+                            <form action="{{ url_for('payments.delete', id=payment.id) }}" method="post"
+                                class="d-inline" onsubmit="return confirm('Excluir esta cobrança?');">
+                                <button type="submit"
+                                    class="btn btn-sm btn-outline-danger rounded-circle border-0 bg-light text-danger"
+                                    style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;"
+                                    title="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-wallet2 fs-1 d-block mb-3 opacity-25"></i>
+                            Nenhum registro financeiro encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

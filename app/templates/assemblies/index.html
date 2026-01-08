@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Assembleias & Votações</h2>
+        <p class="text-muted">Participe das decisões do condomínio sem sair de casa.</p>
+    </div>
+    {% if current_user.is_admin %}
+    <div class="col-auto">
+        <a href="{{ url_for('assemblies.create') }}" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
+            <i class="bi bi-calendar-plus me-1"></i> Agendar Assembleia
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    {% for assembly in assemblies %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    {% if assembly.status == 'scheduled' %}
+                    <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Agendada</span>
+                    {% elif assembly.status == 'open' %}
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Votação Aberta</span>
+                    {% else %}
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3">Encerrada</span>
+                    {% endif %}
+                    <small class="text-muted fw-bold">{{ assembly.start_time.strftime('%d/%m às %H:%M') }}</small>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-3">{{ assembly.title }}</h5>
+                <p class="text-muted mb-4">{{ assembly.description or 'Sem descrição.' }}</p>
+
+                <div class="mt-auto pt-3 border-top">
+                    <a href="{{ url_for('assemblies.details', id=assembly.id) }}"
+                        class="btn btn-primary w-100 rounded-pill fw-bold">
+                        <i class="bi bi-door-open-fill me-1"></i> Entrar na Sala
+                    </a>
+                </div>
+
+                {% if current_user.is_admin %}
+                <div class="mt-2 text-center">
+                    <form action="{{ url_for('assemblies.delete', id=assembly.id) }}" method="post"
+                        onsubmit="return confirm('Tem certeza que deseja excluir esta assembleia? Todos os votos serão perdidos.');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none">
+                            <i class="bi bi-trash"></i> Excluir Assembleia
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <i class="bi bi-calendar-x fs-1 opacity-25 d-block mb-3"></i>
+        <p class="text-muted">Nenhuma assembleia encontrada.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

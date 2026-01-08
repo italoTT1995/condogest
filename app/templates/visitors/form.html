@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h4 class="fw-bold mb-0">Registrar Entrada</h4>
+                <p class="text-muted small">Pesquise um visitante existente ou cadastre um novo.</p>
+            </div>
+            <div class="card-body p-4">
+                <!-- Search Section -->
+                <div class="input-group mb-4">
+                    <input type="text" class="form-control form-control-lg bg-light border-0" id="searchCpf"
+                        placeholder="Buscar por CPF..." aria-label="Buscar CPF">
+                    <button class="btn btn-primary px-4 fw-bold" type="button" id="btnSearch">Buscar</button>
+                </div>
+
+                <hr class="text-muted opacity-25 my-4">
+
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <h6 class="fw-bold text-muted text-uppercase small mb-3">Dados do Visitante</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cpf" class="form-label small fw-bold text-muted">CPF</label>
+                            <input type="text" class="form-control bg-light border-0" id="cpf" name="cpf" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label small fw-bold text-muted">Nome Completo</label>
+                            <input type="text" class="form-control bg-light border-0" id="name" name="name" required>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-muted text-uppercase small mb-3 mt-3">Dados da Visita</h6>
+                    <div class="mb-3">
+                        <label for="unit_id" class="form-label small fw-bold text-muted">Unidade de Destino</label>
+                        <select class="form-select bg-light border-0" id="unit_id" name="unit_id" required>
+                            <option value="" disabled selected>Selecione a unidade...</option>
+                            {% for unit in units %}
+                            <option value="{{ unit.id }}">Unidade {{ unit.number }} - Bloco {{ unit.block }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="observation" class="form-label small fw-bold text-muted">Observação
+                            (Opcional)</label>
+                        <input type="text" class="form-control bg-light border-0" id="observation" name="observation"
+                            placeholder="Ex: Entregador, Visita Técnica...">
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('visitors.index') }}"
+                            class="btn btn-light rounded-pill fw-bold text-muted px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-success rounded-pill fw-bold px-5">Registrar
+                            Entrada</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('btnSearch').addEventListener('click', function () {
+        const cpf = document.getElementById('searchCpf').value;
+        if (!cpf) return;
+
+        fetch(`{{ url_for('visitors.search_visitor') }}?cpf=${cpf}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.found) {
+                    document.getElementById('cpf').value = data.cpf;
+                    document.getElementById('name').value = data.name;
+                    alert('Visitante encontrado! Complete os dados da visita.');
+                } else {
+                    alert('Visitante não encontrado. Preencha o cadastro.');
+                    document.getElementById('cpf').value = cpf;
+                    document.getElementById('name').value = '';
+                    document.getElementById('name').focus();
+                }
+            });
+    });
+</script>
+{% endblock %}

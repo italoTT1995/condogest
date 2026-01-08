@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Controle de Portaria</h2>
+        <p class="text-muted">Gerencie entradas, saídas e histórico de visitantes.</p>
+    </div>
+    <div class="col-auto">
+        {% if current_user.can_register_visits %}
+        <a href="{{ url_for('visitors.new_visit') }}" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
+            <i class="bi bi-person-plus-fill me-1"></i> Nova Entrada
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Stats / Quick Info -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body d-flex align-items-center p-4">
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3">
+                    <span class="fs-4 text-success">👥</span>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Ativos Agora</h5>
+                    <h3 class="fw-bold text-dark my-1">{{ stats.active }}</h3>
+                    <small class="text-muted">No condomínio</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body d-flex align-items-center p-4">
+                <div class="bg-warning bg-opacity-10 p-3 rounded-circle me-3">
+                    <span class="fs-4 text-warning">⏳</span>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Agendados</h5>
+                    <h3 class="fw-bold text-dark my-1">{{ stats.scheduled }}</h3>
+                    <small class="text-muted">Aguardando chegada</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body d-flex align-items-center p-4">
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle me-3">
+                    <span class="fs-4 text-info">📅</span>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Total Hoje</h5>
+                    <h3 class="fw-bold text-dark my-1">{{ stats.today }}</h3>
+                    <small class="text-muted">Entradas realizadas</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active rounded-pill fw-bold px-4 me-2" id="pills-active-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-active" type="button" role="tab">Em Aberto</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill fw-bold px-4 me-2" id="pills-scheduled-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-scheduled" type="button" role="tab">Agendados <span
+                class="badge bg-warning text-dark ms-1">{{ stats.scheduled }}</span></button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill fw-bold px-4 text-muted" id="pills-history-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-history" type="button" role="tab">Histórico</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="pills-tabContent">
+    <!-- ACTIVE VISITS -->
+    <div class="tab-pane fade show active" id="pills-active" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body px-0 py-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 text-muted small text-uppercase font-monospace border-0 py-3">Visitante
+                                </th>
+                                <th class="text-muted small text-uppercase font-monospace border-0 py-3">Unidade Destino
+                                </th>
+                                <th class="text-muted small text-uppercase font-monospace border-0 py-3">Entrada</th>
+                                <th class="text-end pe-4 text-muted small text-uppercase font-monospace border-0 py-3">
+                                    Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in active_visits %}
+                            <tr>
+                                <td class="ps-4">
+                                    <h6 class="fw-bold text-dark mb-0">{{ log.visitor.name }}</h6>
+                                    <small class="text-muted">{{ log.observation }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">Unidade {{ log.unit.number }} - {{
+                                        log.unit.block }}</span>
+                                </td>
+                                <td class="text-muted fw-bold">
+                                    {{ log.entry_time.strftime('%H:%M') }}
+                                </td>
+                                <td class="text-end pe-4">
+                                    <form action="{{ url_for('visitors.log_exit', log_id=log.id) }}" method="post"
+                                        onsubmit="return confirm('Confirmar saída de {{ log.visitor.name }}?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit"
+                                            class="btn btn-sm btn-outline-danger rounded-pill fw-bold px-3">
+                                            Registrar Saída
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">Não há visitantes no local no
+                                    momento.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCHEDULED VISITS (PRE-AUTH) -->
+    <div class="tab-pane fade" id="pills-scheduled" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body px-0 py-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 text-muted small text-uppercase font-monospace border-0 py-3">Visitante
+                                </th>
+                                <th class="text-muted small text-uppercase font-monospace border-0 py-3">Destino</th>
+                                <th class="text-muted small text-uppercase font-monospace border-0 py-3">Previsto</th>
+                                <th class="text-end pe-4 text-muted small text-uppercase font-monospace border-0 py-3">
+                                    Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visit in scheduled_visits %}
+                            <tr>
+                                <td class="ps-4">
+                                    <h6 class="fw-bold text-dark mb-0">{{ visit.visitor.name }}</h6>
+                                    <small class="text-muted">CPF: {{ visit.visitor.cpf }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">Unidade {{ visit.unit.number }}</span>
+                                </td>
+                                <td class="text-muted fw-bold">
+                                    {{ visit.expected_arrival.strftime('%d/%m %H:%M') }}
+                                </td>
+                                <td class="text-end pe-4">
+                                    <form action="{{ url_for('visitors.activate_visit', id=visit.id) }}" method="post"
+                                        onsubmit="return confirm('Confirmar entrada de {{ visit.visitor.name }}?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit" class="btn btn-sm btn-success rounded-pill fw-bold px-4">
+                                            <i class="bi bi-check-lg me-1"></i> Autorizar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar-check fs-1 d-block mb-3 opacity-25"></i>
+                                    Nenhum agendamento pendente.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="tab-pane fade" id="pills-history" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body px-0 py-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 text-muted small text-uppercase font-monospace border-0 py-3">Visitante
+                                </th>
+                                <th class="text-muted small text-uppercase font-monospace border-0 py-3">Unidade</th>
+                                <th class="text-muted small text-uppercase font-monospace border-0 py-3">Entrada</th>
+                                <th class="text-muted small text-uppercase font-monospace border-0 py-3">Saída</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in history_visits %}
+                            <tr>
+                                <td class="ps-4">
+                                    <h6 class="fw-bold text-dark mb-0">{{ log.visitor.name }}</h6>
+                                </td>
+                                <td>Unidade {{ log.unit.number }}</td>
+                                <td class="text-muted small">{{ log.entry_time.strftime('%d/%m %H:%M') }}</td>
+                                <td class="text-muted small">{{ log.exit_time.strftime('%d/%m %H:%M') }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">Sem histórico recente.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

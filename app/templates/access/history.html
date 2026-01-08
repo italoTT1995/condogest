@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Histórico de Acessos</h2>
+        <p class="text-muted">Registro de entradas via Crachá Digital.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('access.scan') }}" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
+            <i class="bi bi-qr-code-scan me-1"></i> Abrir Leitor
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body px-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 text-muted small text-uppercase font-monospace border-0">Data / Hora</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0">Morador</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0">Unidade</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0">Status</th>
+                        <th class="text-muted small text-uppercase font-monospace border-0">Obs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td class="ps-4 text-muted font-monospace">
+                            {{ log.entry_time.strftime('%d/%m/%Y %H:%M:%S') }}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if log.user %}
+                                {% if log.user.profile_image and log.user.profile_image != 'default.jpg' %}
+                                <img src="{{ url_for('static', filename='uploads/profiles/' + log.user.profile_image) }}"
+                                    class="rounded-circle me-2 object-fit-cover border" width="32" height="32">
+                                {% else %}
+                                <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center me-2"
+                                    style="width: 32px; height: 32px;">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                {% endif %}
+                                <span class="fw-bold text-dark">
+                                    {{ log.user.full_name or log.user.username }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">Visitante (ID {{ log.visitor_id }})</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if log.unit %}
+                            <span class="badge bg-light text-dark border">
+                                {{ log.unit.block }} - {{ log.unit.number }}
+                            </span>
+                            {% elif log.user and log.user.unit %}
+                            <span class="badge bg-light text-dark border">
+                                {{ log.user.unit.block }} - {{ log.user.unit.number }}
+                            </span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.access_status == 'allowed' %}
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">LIBERADO</span>
+                            {% else %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">BLOQUEADO</span>
+                            {% endif %}
+                        </td>
+                        <td class="small text-muted">
+                            {{ log.failure_reason or '-' }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-clock-history fs-1 d-block mb-3 opacity-25"></i>
+                            Nenhum registro encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

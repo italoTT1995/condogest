@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">{{ assembly.title }}</h1>
+        <p class="lead text-muted">{{ assembly.description }}</p>
+        <span
+            class="badge {% if assembly.status == 'open' %}bg-success{% elif assembly.status == 'scheduled' %}bg-warning{% else %}bg-secondary{% endif %} rounded-pill px-3">
+            {{ 'Votação Aberta' if assembly.status == 'open' else ('Agendada' if assembly.status == 'scheduled' else
+            'Encerrada') }}
+        </span>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- Attendance Card -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 text-center">
+                    <h5 class="fw-bold mb-3">Quórum Atual</h5>
+
+                    <!-- Circular Progress (Simple CSS) -->
+                    <div class="position-relative d-inline-flex align-items-center justify-content-center mb-3"
+                        style="width: 120px; height: 120px;">
+                        <svg class="w-100 h-100" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#eee" stroke-width="10" />
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#0d6efd" stroke-width="10"
+                                stroke-dasharray="283"
+                                stroke-dashoffset="{{ 283 - (283 * quorum_percentage / 100) }}" />
+                        </svg>
+                        <div class="position-absolute text-center">
+                            <span class="fs-3 fw-bold">{{ unique_units_count }}</span>
+                            <small class="d-block text-muted" style="font-size: 0.7rem;">Unidades</small>
+                        </div>
+                    </div>
+
+                    <p class="text-muted small">Total de unidades presentes.</p>
+
+                    {% if not attendance %}
+                    <form action="{{ url_for('assemblies.check_in', id=assembly.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button type="submit" class="btn btn-success w-100 rounded-pill fw-bold pulse-animation">
+                            <i class="bi bi-check-circle-fill me-1"></i> Marcar Presença
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-success py-2 small fw-bold">
+                        <i class="bi bi-check-lg"></i> Presença Confirmada
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Agenda Items & Voting -->
+        <div class="col-md-8">
+            {% if current_user.is_admin %}
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body bg-light rounded-4">
+                    <h6 class="fw-bold mb-3">Painel do Administrador</h6>
+
+                    <!-- Admin Controls -->
+                    <div class="d-flex gap-2 flex-wrap mb-3">
+                        <form action="" method="post" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="toggle_status" value="true" />
+                            {% if assembly.status == 'scheduled' %}
+                            <button type="submit" name="status" value="open"
+                                class="btn btn-success btn-sm rounded-pill px-3">Iniciar Votação</button>
+                            {% elif assembly.status == 'open' %}
+                            <button type="submit" name="status" value="closed"
+                                class="btn btn-danger btn-sm rounded-pill px-3">Encerrar Assembleia</button>
+                            {% endif %}
+                        </form>
+                    </div>
+
+                    <hr>
+
+                    <form method="post" class="row g-2 align-items-center">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <input type="hidden" name="add_item" value="true" />
+                        <div class="col-md-4">
+                            <input type="text" name="item_title" class="form-control form-control-sm"
+                                placeholder="Título da Pauta" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" name="item_desc" class="form-control form-control-sm"
+                                placeholder="Descrição (Opcional)">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-sm w-100 rounded-pill">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <h5 class="fw-bold mb-3">Pauta do Dia</h5>
+
+            {% for item in assembly.items %}
+            <div class="card border-0 shadow-sm rounded-4 mb-3">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">{{ item.title }}</h5>
+                    <p class="text-muted">{{ item.description }}</p>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <!-- Voting Actions -->
+                        {% if assembly.status == 'open' and attendance and not user_votes.get(item.id) %}
+                        <div class="btn-group w-100" role="group">
+                            <form action="{{ url_for('assemblies.vote', item_id=item.id) }}" method="post"
+                                class="w-100 d-contents">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" name="choice" value="yes"
+                                    class="btn btn-outline-success rounded-start-pill flex-grow-1">
+                                    Sim
+                                </button>
+                                <button type="submit" name="choice" value="abstain"
+                                    class="btn btn-outline-secondary flex-grow-1">
+                                    Abster
+                                </button>
+                                <button type="submit" name="choice" value="no"
+                                    class="btn btn-outline-danger rounded-end-pill flex-grow-1">
+                                    Não
+                                </button>
+                            </form>
+                        </div>
+                        {% elif user_votes.get(item.id) %}
+                        <div class="w-100 text-center">
+                            <span class="badge 
+                                    {% if user_votes[item.id] == 'yes' %}bg-success
+                                    {% elif user_votes[item.id] == 'no' %}bg-danger
+                                    {% else %}bg-secondary{% endif %} 
+                                    px-4 py-2 rounded-pill">
+                                Voto Registrado: {{ user_votes[item.id] | upper }}
+                            </span>
+                        </div>
+                        {% elif not attendance %}
+                        <small class="text-danger fw-bold"><i class="bi bi-exclamation-circle"></i> Marque presença para
+                            votar.</small>
+                        {% else %}
+                        <small class="text-muted"><i class="bi bi-lock"></i> Votação aguardando abertura ou
+                            encerrada.</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-5">
+                Nenhuma pauta cadastrada.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</div>
+
+{% if current_user.is_admin %}
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="fw-bold mb-4">Relatórios da Administração</h3>
+
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill fw-bold" id="pills-presence-tab" data-bs-toggle="pill"
+                    data-bs-target="#pills-presence" type="button" role="tab">Lista de Presença</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold" id="pills-results-tab" data-bs-toggle="pill"
+                    data-bs-target="#pills-results" type="button" role="tab">Resultado Detalhado</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+            <!-- Lista de Presenca -->
+            <div class="tab-pane fade show active" id="pills-presence" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4 py-3">Unidade</th>
+                                        <th class="py-3">Morador</th>
+                                        <th class="py-3">Horário Check-in</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for att in attendance_list %}
+                                    <tr>
+                                        <td class="ps-4 fw-bold text-primary">{{ att.user.unit.block }} - {{
+                                            att.user.unit.number }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
+                                                    style="width: 30px; height: 30px;">
+                                                    <i class="bi bi-person-fill text-muted"></i>
+                                                </div>
+                                                {{ att.user.username }}
+                                            </div>
+                                        </td>
+                                        <td class="text-muted">{{ att.timestamp.strftime('%H:%M:%S') }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">Nenhuma presença marcada.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resultados -->
+            <div class="tab-pane fade" id="pills-results" role="tabpanel">
+                {% for item in assembly.items %}
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0 text-primary">{{ item.title }}</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Totais -->
+                        <div class="row mb-4 text-center">
+                            <div class="col">
+                                <h2 class="text-success fw-bold">{{ item_results[item.id]['yes'] }}</h2>
+                                <span class="text-muted small text-uppercase fw-bold">Sim</span>
+                            </div>
+                            <div class="col">
+                                <h2 class="text-danger fw-bold">{{ item_results[item.id]['no'] }}</h2>
+                                <span class="text-muted small text-uppercase fw-bold">Não</span>
+                            </div>
+                            <div class="col">
+                                <h2 class="text-secondary fw-bold">{{ item_results[item.id]['abstain'] }}</h2>
+                                <span class="text-muted small text-uppercase fw-bold">Abstenções</span>
+                            </div>
+                        </div>
+
+                        <!-- Tabela Detalhada -->
+                        <h6 class="fw-bold text-muted small text-uppercase mb-3">Votos por Unidade</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Unidade</th>
+                                        <th>Morador</th>
+                                        <th>Voto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vote in detailed_votes[item.id] %}
+                                    <tr>
+                                        <td class="fw-bold">{{ vote.user.unit.block }} - {{ vote.user.unit.number }}
+                                        </td>
+                                        <td>{{ vote.user.username }}</td>
+                                        <td>
+                                            {% if vote.choice == 'yes' %} <span class="badge bg-success">SIM</span>
+                                            {% elif vote.choice == 'no' %} <span class="badge bg-danger">NÃO</span>
+                                            {% else %} <span class="badge bg-secondary">ABSTENÇÃO</span> {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+</div>
+
+<style>
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(25, 135, 84, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(25, 135, 84, 0);
+        }
+    }
+
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+</style>
+{% endblock %}

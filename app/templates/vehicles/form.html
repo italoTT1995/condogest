@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h4 class="fw-bold mb-0">Cadastrar Veículo</h4>
+                <p class="text-muted small">Adicione um novo veículo ao sistema.</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="mb-4">
+                        <label for="user_id" class="form-label fw-bold small text-uppercase text-muted">Proprietário
+                            (Morador)</label>
+                        <select class="form-select form-control-lg bg-light border-0" id="user_id" name="user_id"
+                            required>
+                            <option value="" selected disabled>Selecione um morador...</option>
+                            {% for resident in residents %}
+                            <option value="{{ resident.id }}">
+                                {{ resident.username }} (Unidade: {{ resident.unit.block if resident.unit else 'N/A'
+                                }}-{{ resident.unit.number if resident.unit else 'N/A' }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="plate" class="form-label fw-bold small text-uppercase text-muted">Placa</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="plate"
+                                name="plate" placeholder="ABC-1234" required>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="color" class="form-label fw-bold small text-uppercase text-muted">Cor</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="color"
+                                name="color" placeholder="Ex: Prata" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="model"
+                            class="form-label fw-bold small text-uppercase text-muted">Modelo/Marca</label>
+                        <input type="text" class="form-control form-control-lg bg-light border-0" id="model"
+                            name="model" placeholder="Ex: Honda Civic" required>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('vehicles.index') }}"
+                            class="btn btn-light rounded-pill fw-bold text-muted px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold px-4">Cadastrar
+                            Veículo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

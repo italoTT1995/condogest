@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h4 class="fw-bold mb-0">{{ title }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="mb-4">
+                        <label for="name" class="form-label fw-bold small text-uppercase text-muted">Nome do
+                            Condomínio</label>
+                        <input type="text" class="form-control form-control-lg bg-light border-0" id="name" name="name"
+                            value="{{ condo.name if condo else '' }}" required placeholder="Ex: Residencial Sunset">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="address" class="form-label fw-bold small text-uppercase text-muted">Endereço</label>
+                        <input type="text" class="form-control bg-light border-0" id="address" name="address"
+                            value="{{ condo.address if condo else '' }}" placeholder="Ex: Rua das Flores, 123">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="cnpj" class="form-label fw-bold small text-uppercase text-muted">CNPJ
+                            (Opcional)</label>
+                        <input type="text" class="form-control bg-light border-0" id="cnpj" name="cnpj"
+                            value="{{ condo.cnpj if condo else '' }}" placeholder="00.000.000/0001-00">
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('condos.index') }}"
+                            class="btn btn-light rounded-pill fw-bold text-muted px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold px-5">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

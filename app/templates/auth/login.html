@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block guest_layout %}
+<div class="login-page-body">
+    <!-- Banner Header -->
+    <!-- Main Content Area -->
+    <div class="login-content-wrapper">
+        <div class="login-card-modern">
+            <!-- Inner Logo -->
+            <div class="mb-4">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="CondoGest" height="280">
+            </div>
+
+            <!-- Flash Messages inside card -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-warning text-start" role="alert">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form action="" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                <div class="mb-3 input-icon-group text-start">
+                    <i class="bi bi-person"></i>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Usuário"
+                        required>
+                </div>
+
+                <div class="mb-4 input-icon-group text-start">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Senha"
+                        required>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg"
+                        style="background-color: #174a85; border: none;">Entrar</button>
+                </div>
+
+                <div class="text-center">
+                    <a href="#" class="text-decoration-none text-muted small">Esqueceu sua senha?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold text-dark">Documentos & Memória</h2>
+        <p class="text-muted">Repositório oficial de documentos do condomínio.</p>
+    </div>
+    {% if current_user.is_admin %}
+    <div class="col-auto">
+        <button class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm" data-bs-toggle="modal"
+            data-bs-target="#uploadModal">
+            <i class="bi bi-cloud-arrow-up me-1"></i> Novo Documento
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Category Tabs -->
+<ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active rounded-pill fw-bold" id="pills-all-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-all" type="button" role="tab">Todos</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill fw-bold" id="pills-minutes-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-minutes" type="button" role="tab">Atas</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill fw-bold" id="pills-fin-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-fin" type="button" role="tab">Financeiro</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill fw-bold" id="pills-rules-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-rules" type="button" role="tab">Regras/Convenção</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill fw-bold" id="pills-contract-tab" data-bs-toggle="pill"
+            data-bs-target="#pills-contract" type="button" role="tab">Contratos</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="pills-tabContent">
+    <!-- Helper Macro for List -->
+    {% macro doc_list(docs) %}
+    {% if docs %}
+    <div class="row g-3">
+        {% for doc in docs %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 hover-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-start">
+                        <div class="me-3">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                                style="width: 50px; height: 50px;">
+                                {% if 'pdf' in doc.filename %}
+                                <i class="bi bi-file-pdf fs-3 text-danger"></i>
+                                {% elif 'doc' in doc.filename %}
+                                <i class="bi bi-file-word fs-3 text-primary"></i>
+                                {% elif 'xls' in doc.filename %}
+                                <i class="bi bi-file-excel fs-3 text-success"></i>
+                                {% else %}
+                                <i class="bi bi-file-earmark-text fs-3 text-secondary"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-1">{{ doc.title }}</h6>
+                            <p class="text-muted small mb-2">{{ doc.description[:60] }}...</p>
+                            <div class="d-flex align-items-center text-muted small">
+                                <i class="bi bi-calendar3 me-1"></i> {{ doc.created_at.strftime('%d/%m/%Y') }}
+                                {% if not doc.is_public %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-pill"><i
+                                        class="bi bi-lock-fill"></i> Privado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-3 border-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('documents.download', id=doc.id) }}"
+                            class="btn btn-sm btn-outline-primary rounded-pill fw-bold px-3">
+                            <i class="bi bi-download me-1"></i> Baixar
+                        </a>
+
+                        {% if current_user.is_admin %}
+                        <form action="{{ url_for('documents.delete', id=doc.id) }}" method="post" class="d-inline"
+                            onsubmit="return confirm('Excluir documento permanentemente?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button type="submit" class="btn btn-sm btn-link text-danger p-0"><i
+                                    class="bi bi-trash"></i></button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-folder2-open fs-1 opacity-25"></i>
+        <p class="mt-2">Nenhum documento nesta categoria.</p>
+    </div>
+    {% endif %}
+    {% endmacro %}
+
+    <!-- All Tab -->
+    <div class="tab-pane fade show active" id="pills-all" role="tabpanel">
+        {% set all_docs = categories['minutes'] + categories['convention'] + categories['financial'] +
+        categories['contract'] + categories['other'] %}
+        {{ doc_list(all_docs) }}
+    </div>
+
+    <div class="tab-pane fade" id="pills-minutes" role="tabpanel">
+        {{ doc_list(categories['minutes']) }}
+    </div>
+
+    <div class="tab-pane fade" id="pills-fin" role="tabpanel">
+        {{ doc_list(categories['financial']) }}
+    </div>
+
+    <div class="tab-pane fade" id="pills-rules" role="tabpanel">
+        {{ doc_list(categories['convention']) }}
+    </div>
+
+    <div class="tab-pane fade" id="pills-contract" role="tabpanel">
+        {{ doc_list(categories['contract']) }}
+    </div>
+</div>
+
+<!-- Upload Modal -->
+{% if current_user.is_admin %}
+<div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Novo Documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form action="{{ url_for('documents.upload') }}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Título</label>
+                        <input type="text" name="title" class="form-control" required
+                            placeholder="Ex: Regimento Interno 2024">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Categoria</label>
+                        <select name="category" class="form-select" required>
+                            <option value="convention">Regras / Convenção</option>
+                            <option value="minutes">Atas de Assembleia</option>
+                            <option value="financial">Prestação de Contas</option>
+                            <option value="contract">Contratos (Restrito?)</option>
+                            <option value="other">Outros</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Descrição (Opcional)</label>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Arquivo</label>
+                        <input type="file" name="file" class="form-control" required
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png">
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" name="is_public" id="isPublic" checked>
+                        <label class="form-check-label" for="isPublic">
+                            Visível para todos os moradores?
+                        </label>
+                        <div class="form-text text-danger">Desmarque para documentos sigilosos (apenas Admin).</div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold">Fazer Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

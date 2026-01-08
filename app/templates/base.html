@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CondoManager</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+  {% if current_user.is_authenticated %}
+  <div id="wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-header text-center">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="CondoGest" class="img-fluid p-2"
+          style="max-height: 200px;">
+
+        {% if current_user.is_admin or current_user.username == 'admin' %}
+        <div class="dropdown mt-2 px-3">
+          <button class="btn btn-warning fw-bold dropdown-toggle w-100 text-truncate shadow-sm text-dark" type="button"
+            id="condoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-building me-1"></i> {{ session.get('active_condo_name', 'Condomínio') }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark w-100" aria-labelledby="condoDropdown">
+            <li>
+              <h6 class="dropdown-header">Trocar Condomínio</h6>
+            </li>
+            <li><a class="dropdown-item" href="{{ url_for('condos.index') }}"><i class="bi bi-gear me-2"></i>
+                Gerenciar</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <!-- This list should ideally be populated via context processor or AJAX, 
+                     but for now let's link to management page or use a simple loop if we pass condos globally -->
+            <li><a class="dropdown-item small text-muted" href="{{ url_for('condos.index') }}">Ver todos...</a></li>
+          </ul>
+        </div>
+        {% else %}
+        <div class="mt-2 text-center text-white-50 small">
+          <i class="bi bi-building me-1"></i> {{ session.get('active_condo_name', 'Seu Condomínio') }}
+          <br><span style="font-size: 8px;">Role: {{ current_user.user_role.name if current_user.user_role else
+            current_user.role }} ({{ current_user.is_admin }})</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <ul class="list-unstyled components">
+        <li class="{% if request.endpoint == 'main.index' %}active{% endif %}">
+          <a href="{{ url_for('main.index') }}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+
+        <li class="{% if request.endpoint == 'tickets.index' %}active{% endif %}">
+          <a href="{{ url_for('tickets.index') }}">
+            <i class="bi bi-ticket-perforated"></i> Chamados
+          </a>
+        </li>
+
+        {% if current_user.can_manage_complaints %}
+        <li class="{% if request.endpoint and 'complaints' in request.endpoint %}active{% endif %}">
+          <a href="{{ url_for('tickets.complaints') }}">
+            <i class="bi bi-megaphone"></i> Denúncias
+          </a>
+        </li>
+        {% else %}
+        <!-- DEBUG: User cannot manage complaints. Role: {{ current_user.user_role.name if current_user.user_role else current_user.role }} -->
+        {% endif %}
+
+        <!-- Portaria (Visible for Admin/Porteiro) -->
+        {% if current_user.can_register_visits %}
+        <li class="{% if request.endpoint == 'visitors.index' %}active{% endif %}">
+          <a href="{{ url_for('visitors.index') }}">
+            <i class="bi bi-door-open"></i> Portaria
+          </a>
+        </li>
+        <li class="{% if request.endpoint == 'deliveries.index' %}active{% endif %}">
+          <a href="{{ url_for('deliveries.index') }}">
+            <i class="bi bi-box-seam"></i> Encomendas
+          </a>
+        </li>
+        {% endif %}
+
+        <!-- Smart Access (Portaria/Admin) -->
+        {% if current_user.can_register_visits %}
+        <li class="{% if request.endpoint == 'access.scan' %}active{% endif %}">
+          <a href="{{ url_for('access.scan') }}">
+            <i class="bi bi-qr-code-scan"></i> Leitor QR
+          </a>
+        </li>
+        <li class="{% if request.endpoint == 'access.history' %}active{% endif %}">
+          <a href="{{ url_for('access.history') }}">
+            <i class="bi bi-clock-history"></i> Histórico Acessos
+          </a>
+        </li>
+        {% endif %}
+
+        <!-- Reservas (Admin) - Management of Areas -->
+        {% if current_user.is_superuser %}
+        <li class="{% if request.endpoint == 'reservations.manage_areas' %}active{% endif %}">
+          <a href="{{ url_for('reservations.manage_areas') }}">
+            <i class="bi bi-calendar-check"></i> Gerenciar Reservas
+          </a>
+        </li>
+        {% endif %}
+        {% if current_user.is_admin %}
+        <li class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+          <a href="{{ url_for('admin.dashboard') }}">
+            <i class="bi bi-people"></i> Moradores
+          </a>
+        </li>
+        {% endif %}
+
+        <!-- Pagamentos / Financeiro -->
+        {% if not current_user.is_porteiro %}
+        <li class="{% if request.endpoint == 'payments.index' %}active{% endif %}">
+          <a href="{{ url_for('payments.index') }}">
+            <i class="bi bi-cash-coin"></i> Pagamentos
+          </a>
+        </li>
+        {% endif %}
+
+        <!-- Comunicados -->
+        <li class="{% if request.endpoint == 'notices.index' %}active{% endif %}">
+          <a href="{{ url_for('notices.index') }}">
+            <i class="bi bi-megaphone"></i> Comunicados
+          </a>
+        </li>
+
+        <li class="{% if request.endpoint == 'assemblies.index' %}active{% endif %}">
+          <a href="{{ url_for('assemblies.index') }}">
+            <i class="bi bi-calendar3"></i> Assembleias
+          </a>
+        </li>
+
+        <li class="{% if request.endpoint == 'documents.index' %}active{% endif %}">
+          <a href="{{ url_for('documents.index') }}">
+            <i class="bi bi-folder"></i> Documentos
+          </a>
+        </li>
+
+
+
+        {% if current_user.is_porteiro %}
+        <li class="{% if request.endpoint == 'vehicles.index' %}active{% endif %}">
+          <a href="{{ url_for('vehicles.index') }}">
+            <i class="bi bi-car-front"></i> Veículos
+          </a>
+        </li>
+        {% endif %}
+
+        <!-- Resident Specific -->
+        {% if current_user.is_resident %}
+        <li class="{% if request.endpoint == 'vehicles.index' %}active{% endif %}">
+          <a href="{{ url_for('vehicles.index') }}">
+            <i class="bi bi-car-front"></i> Meus Veículos
+          </a>
+        </li>
+        <li class="{% if request.endpoint == 'reservations.my_reservations' %}active{% endif %}">
+          <a href="{{ url_for('reservations.my_reservations') }}">
+            <i class="bi bi-calendar-event"></i> Minhas Reservas
+          </a>
+        </li>
+        <li class="{% if request.endpoint == 'visitors.my_guests' %}active{% endif %}">
+          <a href="{{ url_for('visitors.my_guests') }}">
+            <i class="bi bi-person-check"></i> Minhas Visitas
+          </a>
+        </li>
+        <li class="{% if request.endpoint == 'deliveries.my_deliveries' %}active{% endif %}">
+          <a href="{{ url_for('deliveries.my_deliveries') }}">
+            <i class="bi bi-box"></i> Minhas Encomendas
+          </a>
+        </li>
+        {% endif %}
+
+        <!-- Relatórios (Placeholder) -->
+        {% if current_user.is_admin %}
+        <li class="{% if request.endpoint and 'reports' in request.endpoint %}active{% endif %}">
+          <a href="{{ url_for('reports.index') }}">
+            <i class="bi bi-file-earmark-bar-graph"></i> Relatórios
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <!-- Page Content -->
+    <div id="content">
+      <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 rounded-3">
+        <div class="container-fluid">
+          <button type="button" id="sidebarCollapse" class="btn btn-dark">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('financial.transparency') }}">
+                  <i class="bi bi-graph-up me-1"></i> Transparência
+                </a>
+              </li>
+              <!-- Notification Bell -->
+              <li class="nav-item dropdown me-3">
+                <a class="nav-link position-relative" href="#" id="navbarDropdown" role="button"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-bell fs-5 text-dark"></i>
+                  {% if unread_notifications_count > 0 %}
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ unread_notifications_count }}
+                  </span>
+                  {% endif %}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="navbarDropdown"
+                  style="width: 300px;">
+                  <li>
+                    <h6 class="dropdown-header fw-bold">Notificações</h6>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  {% if recent_notifications %}
+                  {% for notif in recent_notifications %}
+                  <li>
+                    <a class="dropdown-item text-wrap {{ 'bg-light' if not notif.is_read else '' }}" href="#"
+                      onclick="markRead({{ notif.id }}); return false;">
+                      <small class="d-block text-muted" style="font-size: 0.75rem;">{{ notif.created_at.strftime('%d/%m
+                        %H:%M') }}</small>
+                      <span class="{{ 'fw-bold' if not notif.is_read else '' }}">{{ notif.message }}</span>
+                    </a>
+                  </li>
+                  {% endfor %}
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li>
+                    <form action="{{ url_for('notifications.mark_all_read') }}" method="post" class="px-3 py-2">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                      <button type="submit" class="btn btn-sm btn-outline-primary w-100">Marcar todas como
+                        lidas</button>
+                    </form>
+                  </li>
+                  {% else %}
+                  <li class="dropdown-item text-muted text-center py-3">Nenhuma notificação.</li>
+                  {% endif %}
+                </ul>
+              </li>
+
+              <li class="nav-item dropdown">
+                <a class="nav-link fw-bold text-dark d-flex align-items-center" href="#" id="userDropdown" role="button"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+                  {% if current_user.profile_image and current_user.profile_image != 'default_avatar.png' %}
+                  <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_image) }}"
+                    alt="Avatar" class="rounded-circle me-2 object-fit-cover border" width="32" height="32">
+                  {% else %}
+                  <div
+                    class="rounded-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center me-2"
+                    style="width: 32px; height: 32px;">
+                    <i class="bi bi-person-fill"></i>
+                  </div>
+                  {% endif %}
+                  <span>{{ current_user.username }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
+                  <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}"><i class="bi bi-person me-2"></i>
+                      Meu Perfil</a></li>
+                  <li><a class="dropdown-item fw-bold text-primary" href="{{ url_for('access.my_badge') }}"><i
+                        class="bi bi-person-badge me-2"></i> Meu Crachá</a></li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-danger fw-bold" href="{{ url_for('auth.logout') }}">
+                  <i class="bi bi-box-arrow-right"></i> Sair
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <div class="container-fluid">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- Login Page Layout (No Sidebar) -->
+  {% block guest_layout %}
+  <!-- Login Page Layout (Default) -->
+  <div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-warning" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    {% block content_guest %}{% endblock %}
+  </div>
+  {% endblock %}
+  {% endif %}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const sidebarCollapse = document.getElementById('sidebarCollapse');
+      const sidebar = document.getElementById('sidebar');
+      if (sidebarCollapse) {
+        sidebarCollapse.addEventListener('click', function () {
+          sidebar.classList.toggle('active');
+        });
+      }
+    });
+
+    function markRead(id) {
+      fetch(`/notifications/read/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() }}'
+        }
+      }).then(response => {
+        if (response.ok) {
+          // Reload to update UI or simple remove class
+          location.reload();
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>

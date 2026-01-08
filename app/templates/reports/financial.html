@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <a href="{{ url_for('reports.index') }}" class="text-decoration-none text-muted small mb-2 d-block">
+            <i class="bi bi-arrow-left"></i> Voltar para Relatórios
+        </a>
+        <h2 class="fw-bold text-dark">Relatório Financeiro</h2>
+        <p class="text-muted">Resumo de receitas e pendências.</p>
+    </div>
+    <div class="col-auto">
+        <form class="d-flex align-items-center gap-2" method="get">
+            <label class="fw-bold text-muted small w-100">Mês de Referência:</label>
+            <input type="month" name="month" class="form-control" value="{{ month }}" onchange="this.form.submit()">
+            <a href="{{ url_for('reports.export_financial', month=month) }}" class="btn btn-outline-success">
+                <i class="bi bi-download"></i> CSV
+            </a>
+        </form>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-success text-white h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="text-white-50 text-uppercase fw-bold mb-0">Recebidos</h6>
+                    <i class="bi bi-arrow-up-circle fs-4 opacity-50"></i>
+                </div>
+                <h2 class="fw-bold mb-0">R$ {{ "%.2f"|format(total_received)|replace('.', ',') }}</h2>
+                <small class="opacity-75">{{ received|length }} pagamentos confirmados</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-danger text-white h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="text-white-50 text-uppercase fw-bold mb-0">Pendentes / Atrasados</h6>
+                    <i class="bi bi-exclamation-circle fs-4 opacity-50"></i>
+                </div>
+                <h2 class="fw-bold mb-0">R$ {{ "%.2f"|format(total_pending)|replace('.', ',') }}</h2>
+                <small class="opacity-75">{{ pending|length }} pagamentos em aberto</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Table -->
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white border-0 pt-4 px-4">
+        <ul class="nav nav-pills card-header-pills" id="financeTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill fw-bold" id="received-tab" data-bs-toggle="tab"
+                    data-bs-target="#received-pane" type="button">
+                    Recebidos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold text-danger" id="pending-tab" data-bs-toggle="tab"
+                    data-bs-target="#pending-pane" type="button">
+                    Inadimplência
+                </button>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body px-0">
+        <div class="tab-content" id="financeTabContent">
+            <!-- Received Payments -->
+            <div class="tab-pane fade show active" id="received-pane" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Morador</th>
+                                <th>Unidade</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Vencimento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in received %}
+                            <tr>
+                                <td class="ps-4 fw-bold">{{ p.resident.username }}</td>
+                                <td>BLOCO {{ p.resident.unit.block }} - {{ p.resident.unit.number }}</td>
+                                <td>{{ p.description }}</td>
+                                <td class="text-success fw-bold">R$ {{ "%.2f"|format(p.amount)|replace('.', ',') }}</td>
+                                <td>{{ p.due_date.strftime('%d/%m/%Y') }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">Nenhum recebimento neste período.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pending Payments -->
+            <div class="tab-pane fade" id="pending-pane" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Morador</th>
+                                <th>Unidade</th>
+                                <th>Descrição</th>
+                                <th>Valor Pendente</th>
+                                <th>Vencimento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in pending %}
+                            <tr>
+                                <td class="ps-4 fw-bold">{{ p.resident.username }}</td>
+                                <td>BLOCO {{ p.resident.unit.block }} - {{ p.resident.unit.number }}</td>
+                                <td>{{ p.description }}</td>
+                                <td class="text-danger fw-bold">R$ {{ "%.2f"|format(p.amount)|replace('.', ',') }}</td>
+                                <td class="text-danger fw-bold">{{ p.due_date.strftime('%d/%m/%Y') }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">Nenhuma pendência encontrada.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
