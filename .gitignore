@@ -143,5 +143,4 @@ Thumbs.db
 # Project specific
 app.db
 condominio.db
-*.bat
 *.ps1
