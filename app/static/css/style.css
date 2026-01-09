@@ -186,6 +186,13 @@ h6 {
         padding: 10px;
         border-radius: 8px;
     }
+
+    /* Restore mobile padding and allow scroll */
+    #content {
+        padding: 15px;
+        overflow-x: auto;
+        /* Allow horizontal scroll if needed */
+    }
 }
 
 /* Login Page Specifics */
