@@ -15,9 +15,12 @@ def login():
         return redirect(url_for('main.index'))
     
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['username'].strip().lower() # Normalize input (mobile friendly)
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
+        # Try finding by lowercase username. 
+        # Note: If database has mixed case usernames, this might need logic tweak, 
+        # but for 'admin' and standard usernames, lowercase is safer convention.
+        user = User.query.filter(User.username.ilike(username)).first()
         
         from datetime import datetime
         
