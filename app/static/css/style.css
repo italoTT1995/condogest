@@ -247,8 +247,19 @@ h6 {
 }
 
 .btn-login:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.login-logo {
+    max-height: 280px;
+    width: auto;
+}
+
+@media (max-width: 768px) {
+    .login-logo {
+        max-height: 150px;
+        /* Smaller on mobile */
+    }
 }
 
 /* New Login Design */
