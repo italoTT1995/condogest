@@ -150,7 +150,10 @@ h6 {
     #sidebar {
         margin-left: -260px;
         position: fixed;
-        min-height: 100vh;
+        height: 100vh;
+        /* Fixed height for scroll */
+        overflow-y: auto;
+        /* Enable vertical scroll */
         z-index: 9999;
         transition: all 0.3s;
     }
