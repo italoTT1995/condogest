@@ -60,8 +60,14 @@ class User(UserMixin, db.Model):
         # Check both old string role and new Role object
         if self.user_role:
              # Admin and Síndico have administrative access
-             return self.user_role.name in ['Admin', 'Síndico', 'Sindico']
+             return self.user_role.name in ['Admin', 'Síndico', 'Sindico', 'sindico']
         return self.role == 'admin'
+
+    @property
+    def is_sindico(self):
+        if self.user_role:
+            return self.user_role.name in ['Síndico', 'Sindico', 'sindico']
+        return self.role.lower() in ['síndico', 'sindico']
 
     @property
     def is_superuser(self):
@@ -83,6 +89,12 @@ class User(UserMixin, db.Model):
         if self.user_role:
             return self.user_role.name == 'Porteiro'
         return self.role.lower() == 'porteiro'
+
+    @property
+    def is_zelador(self):
+        if self.user_role:
+            return self.user_role.name in ['Zelador', 'zelador']
+        return self.role.lower() == 'zelador'
 
     @property
     def can_manage_complaints(self):

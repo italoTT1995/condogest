@@ -39,7 +39,7 @@ def index():
 @login_required
 def complaints():
     # Similar to index but for complaints
-    if not (current_user.is_admin or current_user.can_manage_complaints):
+    if not (current_user.is_admin or current_user.can_manage_complaints or current_user.is_zelador or current_user.is_sindico):
          # If resident, they can see their own complaints
          complaints = Ticket.query.filter_by(user_id=current_user.id, category='complaint').order_by(Ticket.created_at.desc()).all()
     else:

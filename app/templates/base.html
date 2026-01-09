@@ -62,14 +62,13 @@
           </a>
         </li>
 
-        {% if current_user.can_manage_complaints %}
+        {% if current_user.can_manage_complaints or current_user.is_resident or current_user.is_zelador or
+        current_user.is_sindico %}
         <li class="{% if request.endpoint and 'complaints' in request.endpoint %}active{% endif %}">
           <a href="{{ url_for('tickets.complaints') }}">
             <i class="bi bi-megaphone"></i> Denúncias
           </a>
         </li>
-        {% else %}
-        <!-- DEBUG: User cannot manage complaints. Role: {{ current_user.user_role.name if current_user.user_role else current_user.role }} -->
         {% endif %}
 
         <!-- Portaria (Visible for Admin/Porteiro) -->
@@ -117,7 +116,8 @@
         {% endif %}
 
         <!-- Pagamentos / Financeiro -->
-        {% if not current_user.is_porteiro %}
+        {# Hide for Porteiro and Zelador #}
+        {% if not current_user.is_porteiro and not current_user.is_zelador %}
         <li class="{% if request.endpoint == 'payments.index' %}active{% endif %}">
           <a href="{{ url_for('payments.index') }}">
             <i class="bi bi-cash-coin"></i> Pagamentos
