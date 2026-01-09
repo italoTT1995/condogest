@@ -187,12 +187,15 @@ h6 {
         border-radius: 8px;
     }
 
-    /* Restore mobile padding and allow scroll */
+    /* Restore mobile padding settings */
     #content {
         padding: 15px;
-        overflow-x: auto;
-        /* Allow horizontal scroll if needed */
+        overflow: visible;
+        /* IMPERATIVE for Dropdowns to work */
+        width: 100%;
     }
+
+    /* Wrap tables or wide content with .table-responsive instead of scrolling the whole page */
 }
 
 /* Login Page Specifics */
