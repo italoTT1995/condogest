@@ -148,18 +148,43 @@ h6 {
 /* Responsive */
 @media (max-width: 768px) {
     #sidebar {
-        margin-left: calc(var(--sidebar-width) * -1);
+        margin-left: -260px;
         position: fixed;
-        height: 100%;
-        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        min-height: 100vh;
+        z-index: 9999;
+        transition: all 0.3s;
     }
 
     #sidebar.active {
         margin-left: 0;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     }
 
-    #content {
-        padding: 15px;
+    #sidebarCollapse span {
+        display: none;
+    }
+
+    /* Content overlay when sidebar is active */
+    #sidebar.active+#content {
+        position: relative;
+    }
+
+    #sidebar.active+#content::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 9998;
+    }
+
+    .navbar-nav {
+        margin-top: 10px;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 8px;
     }
 }
 

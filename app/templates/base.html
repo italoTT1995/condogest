@@ -328,6 +328,14 @@
           sidebar.classList.toggle('active');
         });
       }
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', function (event) {
+        const isClickInside = sidebar.contains(event.target) || sidebarCollapse.contains(event.target);
+        if (!isClickInside && sidebar.classList.contains('active') && window.innerWidth <= 768) {
+          sidebar.classList.remove('active');
+        }
+      });
     });
 
     function markRead(id) {
