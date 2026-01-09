@@ -8,7 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=4">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=5">
 </head>
 
 <body>
@@ -323,19 +323,22 @@
     document.addEventListener('DOMContentLoaded', function () {
       const sidebarCollapse = document.getElementById('sidebarCollapse');
       const sidebar = document.getElementById('sidebar');
-      if (sidebarCollapse) {
+      if (sidebarCollapse && sidebar) {
         sidebarCollapse.addEventListener('click', function () {
           sidebar.classList.toggle('active');
         });
-      }
 
-      // Close sidebar when clicking outside on mobile
-      document.addEventListener('click', function (event) {
-        const isClickInside = sidebar.contains(event.target) || sidebarCollapse.contains(event.target);
-        if (!isClickInside && sidebar.classList.contains('active') && window.innerWidth <= 768) {
-          sidebar.classList.remove('active');
-        }
-      });
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (event) {
+          // Check if sidebar is active and we are on mobile
+          if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+            const isClickInside = sidebar.contains(event.target) || sidebarCollapse.contains(event.target);
+            if (!isClickInside) {
+              sidebar.classList.remove('active');
+            }
+          }
+        });
+      }
     });
 
     function markRead(id) {
