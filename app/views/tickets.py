@@ -131,7 +131,7 @@ def update_status(id):
 @tickets_bp.route('/<int:id>/delete', methods=['POST'])
 @login_required
 def delete(id):
-    if not current_user.is_admin:
+    if not (current_user.is_admin or current_user.is_sindico):
         flash('Acesso negado. Apenas administradores podem excluir chamados.')
         return redirect(url_for('tickets.index'))
     
