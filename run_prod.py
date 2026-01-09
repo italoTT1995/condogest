@@ -5,6 +5,10 @@ import socket
 
 app = create_app()
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
+
 def get_ip_address():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
