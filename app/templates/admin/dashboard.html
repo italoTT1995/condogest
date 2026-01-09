@@ -96,6 +96,7 @@
                                     <form action="{{ url_for('admin.delete_user', id=user.id) }}" method="post"
                                         class="d-inline"
                                         onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button type="submit"
                                             class="btn btn-sm btn-outline-danger rounded-circle border-0 bg-light text-danger"
                                             style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;"
@@ -150,6 +151,7 @@
                                     <form action="{{ url_for('admin.delete_unit', id=unit.id) }}" method="post"
                                         class="d-inline"
                                         onsubmit="return confirm('Tem certeza que deseja excluir esta unidade?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button type="submit"
                                             class="btn btn-sm btn-outline-danger rounded-circle border-0 bg-light text-danger"
                                             style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;"
