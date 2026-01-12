@@ -19,8 +19,10 @@
                         <datalist id="residentsParams">
                             {% for resident in residents %}
                             <!-- Value is Name, we store Unit ID in data attribute via JS logic or composite value -->
+                            {% if resident.unit %}
                             <option value="{{ resident.username }}" data-unit-id="{{ resident.unit_id }}">BL {{
                                 resident.unit.block }} - AP {{ resident.unit.number }}</option>
+                            {% endif %}
                             {% endfor %}
                         </datalist>
                     </div>
