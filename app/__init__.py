@@ -45,6 +45,8 @@ def create_app(config_class=Config):
     from app.models.delivery import Delivery
     
     with app.app_context():
+        # Ensure all tables exist (fix for missing PushSubscription table on prod)
+        db.create_all()
         pass # This block is likely a placeholder for future model registration or setup if needed.
 
     from app.views.main import main_bp
