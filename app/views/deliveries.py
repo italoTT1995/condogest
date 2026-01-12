@@ -99,8 +99,8 @@ def new():
                 db.session.add(notif)
                 
                 # 2. Email Notification
-                if resident.email:
-                    try:
+                try:
+                    if resident.email:
                         email_msg = Message(f"📦 Nova Encomenda Chegou! - {unit.block}-{unit.number}",
                                       recipients=[resident.email])
                         
@@ -118,9 +118,8 @@ Atenciosamente,
 Portaria do Condomínio
 """
                         mail.send(email_msg)
-                    except Exception as e:
-                        print(f"Erro ao enviar email para {resident.email}: {e}")
-                        # Don't break the flow if email fails
+                except Exception as e:
+                    print(f"Erro ao enviar email para {resident.email}: {e}")
                 
                 # 3. Web Push Notification
                 try:
