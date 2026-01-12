@@ -12,6 +12,20 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="mb-3">
+                        <label for="resident_search" class="form-label small fw-bold text-muted"><i
+                                class="bi bi-search me-1"></i> Buscar por Nome (Auto-preencher)</label>
+                        <input class="form-control" list="residentsParams" id="resident_search"
+                            placeholder="Digite o nome do morador...">
+                        <datalist id="residentsParams">
+                            {% for resident in residents %}
+                            <!-- Value is Name, we store Unit ID in data attribute via JS logic or composite value -->
+                            <option value="{{ resident.username }}" data-unit-id="{{ resident.unit_id }}">BL {{
+                                resident.unit.block }} - AP {{ resident.unit.number }}</option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="unit_id" class="form-label small fw-bold text-muted">Unidade Destino</label>
                         <select class="form-select form-select-lg bg-light border-0" id="unit_id" name="unit_id"
                             required>
@@ -21,6 +35,26 @@
                             {% endfor %}
                         </select>
                     </div>
+
+                    <script>
+                        document.getElementById('resident_search').addEventListener('input', function (e) {
+                            var input = e.target;
+                            var list = input.getAttribute('list');
+                            var options = document.getElementById(list).childNodes;
+                            for (var i = 0; i < options.length; i++) {
+                                if (options[i].value === input.value) {
+                                    // Found the resident
+                                    var unitId = options[i].getAttribute('data-unit-id');
+                                    if (unitId) {
+                                        document.getElementById('unit_id').value = unitId;
+                                        // Auto fill label
+                                        document.getElementById('recipient_label').value = input.value;
+                                    }
+                                    break;
+                                }
+                            }
+                        });
+                    </script>
 
                     <div class="mb-3">
                         <label for="description" class="form-label small fw-bold text-muted">Descrição</label>

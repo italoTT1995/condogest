@@ -135,8 +135,14 @@ Portaria do Condomínio
         return redirect(url_for('deliveries.index'))
 
     from flask import session
-    units = Unit.query.filter_by(condo_id=session.get('active_condo_id')).order_by(Unit.block, Unit.number).all()
-    return render_template('deliveries/form.html', units=units)
+    condo_id = session.get('active_condo_id')
+    units = Unit.query.filter_by(condo_id=condo_id).order_by(Unit.block, Unit.number).all()
+    
+    # Fetch residents for name search
+    from app.models.user import User
+    residents = User.query.join(Unit).filter(Unit.condo_id == condo_id).order_by(User.username).all()
+    
+    return render_template('deliveries/form.html', units=units, residents=residents)
 
 @deliveries_bp.route('/pickup/<int:id>', methods=['POST'])
 @login_required
