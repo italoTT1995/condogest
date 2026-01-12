@@ -121,12 +121,12 @@ Portaria do Condomínio
                 except Exception as e:
                     print(f"Erro ao enviar email para {resident.email}: {e}")
                 
-                # 3. Web Push Notification
-                try:
-                    from app.views.notifications import send_web_push
-                    send_web_push(resident.id, msg_text)
-                except Exception as e:
-                     print(f"Push Error: {e}")
+                # 3. Web Push Notification - REMOVED due to instability
+                # try:
+                #     from app.views.notifications import send_web_push
+                #     send_web_push(resident.id, msg_text)
+                # except Exception as e:
+                #      print(f"Push Error: {e}")
 
         
         db.session.commit()
