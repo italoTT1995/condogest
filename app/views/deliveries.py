@@ -121,6 +121,13 @@ Portaria do Condomínio
                     except Exception as e:
                         print(f"Erro ao enviar email para {resident.email}: {e}")
                         # Don't break the flow if email fails
+                
+                # 3. Web Push Notification
+                try:
+                    from app.views.notifications import send_web_push
+                    send_web_push(resident.id, msg_text)
+                except Exception as e:
+                     print(f"Push Error: {e}")
 
         
         db.session.commit()
@@ -160,3 +167,42 @@ def my_deliveries():
     my_history = Delivery.query.filter_by(unit_id=current_user.unit_id, status='picked_up').order_by(Delivery.picked_up_at.desc()).limit(10).all()
     
     return render_template('deliveries/my_deliveries.html', pending=my_pending, history=my_history)
+
+@deliveries_bp.route('/history')
+@login_required
+def history():
+    if not current_user.can_register_visits:
+        flash('Acesso negado.', 'danger')
+        return redirect(url_for('main.index'))
+        
+    from flask import session
+    condo_id = session.get('active_condo_id')
+    
+    # Show last 100 picked up items
+    history_deliveries = Delivery.query.join(Unit).filter(
+        Unit.condo_id == condo_id,
+        Delivery.status == 'picked_up'
+    ).order_by(Delivery.picked_up_at.desc()).limit(100).all()
+    
+    return render_template('deliveries/history.html', deliveries=history_deliveries)
+
+@deliveries_bp.route('/<int:id>/delete', methods=['POST'])
+@login_required
+def delete(id):
+    if not current_user.can_register_visits: # Assuming admin/porteiro can delete
+        flash('Acesso negado.', 'danger')
+        return redirect(url_for('main.index'))
+        
+    delivery = Delivery.query.get_or_404(id)
+    
+    # Optional: Check if it belongs to current condo context
+    
+    db.session.delete(delivery)
+    db.session.commit()
+    flash('Encomenda excluída com sucesso.', 'success')
+    
+    # Redirect back to where user came from or index
+    referrer = request.referrer
+    if referrer and 'history' in referrer:
+        return redirect(url_for('deliveries.history'))
+    return redirect(url_for('deliveries.index'))

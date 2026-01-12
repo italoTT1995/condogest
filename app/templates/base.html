@@ -351,7 +351,93 @@
           }
         });
       }
+
+      // --- Web Push Subscription Logic ---
+      if ('serviceWorker' in navigator && 'PushManager' in window) {
+        navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}")
+          .then(function (swReg) {
+            console.log('Service Worker Registered', swReg);
+
+            {% if current_user.is_authenticated %}
+            // Ask for permission and subscribe
+            // Note: In real app, put this on a button "Ativar Notificações"
+            // Automatically asking on load can be intrusive, but ok for internal app
+            Notification.requestPermission().then(function (permission) {
+              if (permission === 'granted') {
+                subscribeUser(swReg);
+              }
+            });
+            {% endif %}
+          })
+          .catch(function (error) {
+            console.error('Service Worker Error', error);
+          });
+      }
     });
+
+    function urlB64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
+    }
+
+    function subscribeUser(swReg) {
+      // VAPID Public Key (Must equal server side)
+      // If environment variable is set, it will be prioritized, otherwise falling back
+      // Note: We need to pass this variable from backend. For now injecting here or fetching.
+      // Ideally, pass via a context processor or a meta tag.
+      // Let's use a placeholder request to get it or hardcode for now if env not available in template
+      // Better approach: fetch from an endpoint.
+
+      // Fetch public key first
+      fetch('/notifications/vapid_public_key')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.publicKey) return;
+
+          const applicationServerKey = urlB64ToUint8Array(data.publicKey);
+          swReg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: applicationServerKey
+          })
+            .then(function (subscription) {
+              console.log('User is subscribed:', subscription);
+              updateSubscriptionOnServer(subscription);
+            })
+            .catch(function (err) {
+              console.log('Failed to subscribe the user: ', err);
+            });
+        });
+    }
+
+    function updateSubscriptionOnServer(subscription) {
+      fetch('/notifications/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ subscription_info: subscription })
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Bad status code from server.');
+          }
+          return response.json();
+        })
+        .then(function (responseData) {
+          if (!responseData.success) {
+            throw new Error('Bad response from server.');
+          }
+        });
+    }
 
     function markRead(id) {
       fetch(`/notifications/read/${id}`, {
