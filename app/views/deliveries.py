@@ -140,6 +140,8 @@ Portaria do Condomínio
     
     # Fetch residents for name search
     from app.models.user import User
+    # Use db.session mapping to avoid import circularity issues with Model.query sometimes
+    # And ensuring we get the user with the unit loaded
     residents = User.query.join(Unit).filter(Unit.condo_id == condo_id).order_by(User.username).all()
     
     return render_template('deliveries/form.html', units=units, residents=residents)
