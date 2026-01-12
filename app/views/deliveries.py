@@ -83,16 +83,45 @@ def new():
         unit = Unit.query.get(unit_id)
         if unit:
             from app.models.notification import Notification
+            from flask_mail import Message
+            from app import mail
+            
             for resident in unit.residents:
-                msg = f"Chegou encomenda! {description}"
+                msg_text = f"Chegou encomenda! {description}"
                 if recipient_label:
-                    msg += f" (Para: {recipient_label})"
+                    msg_text += f" (Para: {recipient_label})"
                 
+                # 1. In-App Notification
                 notif = Notification(
                     user_id=resident.id,
-                    message=msg
+                    message=msg_text
                 )
                 db.session.add(notif)
+                
+                # 2. Email Notification
+                if resident.email:
+                    try:
+                        email_msg = Message(f"📦 Nova Encomenda Chegou! - {unit.block}-{unit.number}",
+                                      recipients=[resident.email])
+                        
+                        email_msg.body = f"""Olá {resident.username},
+
+Uma nova encomenda foi registrada para sua unidade.
+
+Descrição: {description}
+Destinatário (etiqueta): {recipient_label or 'Não informado'}
+Local de Armazenamento: {storage_location or 'Portaria'}
+
+Acesse o sistema para ver mais detalhes (e a foto, se houver).
+
+Atenciosamente,
+Portaria do Condomínio
+"""
+                        mail.send(email_msg)
+                    except Exception as e:
+                        print(f"Erro ao enviar email para {resident.email}: {e}")
+                        # Don't break the flow if email fails
+
         
         db.session.commit()
         flash('Encomenda registrada e moradores notificados!', 'success')
