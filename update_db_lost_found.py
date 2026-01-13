@@ -1,5 +1,6 @@
 from app import create_app, db
 from app.models.lost_found import LostItem
+from app.models.condominium import Condominium
 
 app = create_app()
 
