@@ -356,23 +356,24 @@
           }
         });
       }
+    });
 
-      /* Web Push Logic Removed */
+    /* Web Push Logic Removed */
 
-      function markRead(id) {
-        fetch(`/notifications/read/${id}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token() }}'
-          }
-        }).then(response => {
-          if (response.ok) {
-            // Reload to update UI or simple remove class
-            location.reload();
-          }
-        });
-      }
+    function markRead(id) {
+      fetch(`/notifications/read/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() }}'
+        }
+      }).then(response => {
+        if (response.ok) {
+          // Reload to update UI or simple remove class
+          location.reload();
+        }
+      });
+    }
   </script>
 </body>
 
