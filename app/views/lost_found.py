@@ -14,19 +14,25 @@ lost_found_bp = Blueprint('lost_found', __name__)
 @lost_found_bp.route('/')
 @login_required
 def index():
-    from flask import session
-    condo_id = session.get('active_condo_id')
-    
-    items_unclaimed = LostItem.query.filter_by(condo_id=condo_id, status='unclaimed').order_by(LostItem.found_at.desc()).all()
-    items_claimed = LostItem.query.filter_by(condo_id=condo_id, status='claimed').order_by(LostItem.claimed_at.desc()).limit(20).all()
-    
-    # Get residents for the claim modal datalist
-    residents = User.query.join(Unit).filter(Unit.condo_id == condo_id).order_by(User.username).all()
-    
-    return render_template('lost_found/index.html', 
-                         items_unclaimed=items_unclaimed, 
-                         items_claimed=items_claimed,
-                         residents=residents)
+    try:
+        from flask import session
+        condo_id = session.get('active_condo_id')
+        
+        items_unclaimed = LostItem.query.filter_by(condo_id=condo_id, status='unclaimed').order_by(LostItem.found_at.desc()).all()
+        items_claimed = LostItem.query.filter_by(condo_id=condo_id, status='claimed').order_by(LostItem.claimed_at.desc()).limit(20).all()
+        
+        # Get residents for the claim modal datalist
+        residents = User.query.join(Unit).filter(Unit.condo_id == condo_id).order_by(User.username).all()
+        
+        return render_template('lost_found/index.html', 
+                             items_unclaimed=items_unclaimed, 
+                             items_claimed=items_claimed,
+                             residents=residents)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        flash(f"Erro ao carregar página: {str(e)}", 'danger')
+        return redirect(url_for('main.index'))
 
 @lost_found_bp.route('/new', methods=['POST'])
 @login_required
