@@ -10,6 +10,13 @@ from app.models.core import Ticket, Notice, Payment
 def landing():
     return render_template('landing.html')
 
+@main_bp.route('/debug/db')
+def debug_db():
+    from flask import current_app
+    uri = current_app.config['SQLALCHEMY_DATABASE_URI']
+    # Simple masking
+    return f"Active DB Connection: {uri.replace(':', '***').replace('@', ' AT ')}"
+
 @main_bp.route('/')
 @login_required
 def index():
