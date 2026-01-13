@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CondoGest - O Futuro do Seu Condomínio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #0d6efd 0%, #000046 100%);
+            color: white;
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: white;
+            clip-path: polygon(0 40%, 100% 100%, 100% 100%, 0 100%);
+        }
+
+        .feature-card {
+            border: none;
+            border-radius: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            background: #f8f9fa;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: #e7f1ff;
+            color: #0d6efd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-glow {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s;
+        }
+
+        .btn-glow:hover {
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        .mockup-img {
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 5px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 50px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 5px;
+            background: #0d6efd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top py-3"
+        style="background: rgba(13, 110, 253, 0.95); backdrop-filter: blur(10px);">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3" href="#"><i class="bi bi-buildings-fill me-2"></i>CondoGest</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-3">
+                    <li class="nav-item"><a class="nav-link text-white" href="#features">Funcionalidades</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#benefits">Vantagens</a></li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light rounded-pill px-4">Área do
+                            Cliente</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center text-lg-start d-flex align-items-center" style="min-height: 90vh;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <h1 class="display-3 fw-bold mb-4 lh-sm">Gestão de Condomínios <span
+                            class="text-info">Reinventada</span>.</h1>
+                    <p class="lead mb-5 opacity-75 fs-4">Adeus planilhas e cadernos. Tenha portaria digital, financeiro
+                        transparente e comunicação eficiente em um único aplicativo.</p>
+                    <div class="d-flex gap-3 flex-column flex-sm-row justify-content-center justify-content-lg-start">
+                        <a href="{{ url_for('auth.login') }}"
+                            class="btn btn-light btn-lg rounded-pill px-5 py-3 fw-bold text-primary btn-glow">Ver
+                            Demonstração</a>
+                        <a href="#contact" class="btn btn-outline-light btn-lg rounded-pill px-5 py-3 fw-bold">Fale
+                            Conosco</a>
+                    </div>
+                    <div
+                        class="mt-4 small d-flex align-items-center gap-3 justify-content-center justify-content-lg-start opacity-50">
+                        <span><i class="bi bi-shield-check me-1"></i> 100% Seguro</span>
+                        <span><i class="bi bi-phone me-1"></i> App Mobile</span>
+                        <span><i class="bi bi-cloud me-1"></i> Nuvem</span>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <!-- Placeholder for App Screenshot -->
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1974&q=80"
+                            alt="App Dashboard" class="img-fluid mockup-img">
+                        <div
+                            class="position-absolute bottom-0 start-0 bg-white text-dark p-3 rounded-4 shadow m-4 animate-up">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-success fs-3 me-3"></i>
+                                <div class="text-start">
+                                    <h6 class="mb-0 fw-bold">Encomenda Registrada</h6>
+                                    <small class="text-muted">Notificação enviada em 1s</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5" id="features">
+        <div class="container py-5">
+            <div class="text-center">
+                <h2 class="display-5 fw-bold section-title">Tudo o que você precisa</h2>
+            </div>
+
+            <div class="row g-4 pt-4">
+                <!-- Card 1 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-box mx-auto">
+                                <i class="bi bi-qr-code-scan"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Portaria Inteligente</h4>
+                            <p class="text-muted">Entrada por QR Code (Crachá Digital), registro de visitantes com foto
+                                e controle total de acesso.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-box mx-auto">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Gestão de Encomendas</h4>
+                            <p class="text-muted">O porteiro tira foto da caixa, o sistema avisa o morador na hora.
+                                Reduza o acúmulo de pacotes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-box mx-auto">
+                                <i class="bi bi-cash-coin"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Transparência Financeira</h4>
+                            <p class="text-muted">Balancetes em tempo real, segunda via de boletos e gráficos claros de
+                                despesas para os moradores.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-box mx-auto">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Reservas e Lazer</h4>
+                            <p class="text-muted">Agendamento de salão de festas e churrasqueira 100% online, sem
+                                conflitos de horário.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 (NEW) -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-box mx-auto">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Achados e Perdidos</h4>
+                            <p class="text-muted">Módulo digital para itens encontrados. Organização e facilidade para
+                                quem perdeu algo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card feature-card p-4">
+                        <div class="card-body text-center">
+                            <div class="icon-box mx-auto">
+                                <i class="bi bi-chat-dots"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Comunicação Direta</h4>
+                            <p class="text-muted">Mural de avisos digital e sistema de chamados (Tickets) para
+                                manutenção e sugestões.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Numbers / Social Proof -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h2 class="display-4 fw-bold text-primary">100%</h2>
+                    <p class="fs-5 text-muted">Digital</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h2 class="display-4 fw-bold text-primary">Zero</h2>
+                    <p class="fs-5 text-muted">Papel</p>
+                </div>
+                <div class="col-md-4">
+                    <h2 class="display-4 fw-bold text-primary">24/7</h2>
+                    <p class="fs-5 text-muted">Disponível</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA / Contact -->
+    <section class="py-5" id="contact">
+        <div class="container py-5">
+            <div class="bg-primary text-white rounded-5 p-5 text-center shadow-lg position-relative overflow-hidden">
+                <div class="position-relative z-1">
+                    <h2 class="display-5 fw-bold mb-4">Pronto para modernizar seu condomínio?</h2>
+                    <p class="lead mb-5 px-lg-5">Junte-se aos condomínios que já estão economizando tempo e dinheiro com
+                        o CondoGest. Agende uma apresentação personalizada.</p>
+                    <a href="mailto:contato@condogest.com"
+                        class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary btn-glow">Falar com
+                        Consultor</a>
+                </div>
+                <!-- Abstract Circles -->
+                <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-white opacity-10"
+                    style="width: 300px; height: 300px;"></div>
+                <div class="position-absolute bottom-0 end-0 translate-middle rounded-circle bg-white opacity-10"
+                    style="width: 400px; height: 400px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-4 mb-md-0">
+                    <h4 class="fw-bold mb-3"><i class="bi bi-buildings-fill me-2"></i>CondoGest</h4>
+                    <p class="text-white-50 small mb-0">© 2026 CondoGest Tecnologia. Todos os direitos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="d-flex justify-content-center justify-content-md-end gap-3">
+                        <a href="#" class="text-white-50 hover-white"><i class="bi bi-instagram fs-4"></i></a>
+                        <a href="#" class="text-white-50 hover-white"><i class="bi bi-linkedin fs-4"></i></a>
+                        <a href="#" class="text-white-50 hover-white"><i class="bi bi-whatsapp fs-4"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

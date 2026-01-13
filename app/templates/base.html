@@ -91,6 +91,11 @@
             <i class="bi bi-box-seam"></i> Encomendas
           </a>
         </li>
+        <li class="{% if request.endpoint and 'lost_found' in request.endpoint %}active{% endif %}">
+          <a href="{{ url_for('lost_found.index') }}">
+            <i class="bi bi-search"></i> Achados e Perdidos
+          </a>
+        </li>
         {% endif %}
 
         <!-- Smart Access (Portaria/Admin) -->

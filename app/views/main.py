@@ -5,6 +5,11 @@ main_bp = Blueprint('main', __name__)
 
 from app.models.core import Ticket, Notice, Payment
 
+
+@main_bp.route('/presentation')
+def landing():
+    return render_template('landing.html')
+
 @main_bp.route('/')
 @login_required
 def index():
