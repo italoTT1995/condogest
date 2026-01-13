@@ -43,6 +43,8 @@ def create_app(config_class=Config):
     from app.models.amenity import CommonArea, Reservation
     from app.models.vehicle import Vehicle
     from app.models.delivery import Delivery
+    from app.models.lost_found import LostItem
+    from app.models.visitor import VisitLog
     
     with app.app_context():
         # Ensure all tables exist (fix for missing PushSubscription table on prod)
