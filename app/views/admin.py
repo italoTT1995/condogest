@@ -216,3 +216,26 @@ def delete_unit(id):
     db.session.commit()
     flash('Unidade excluída com sucesso.')
     return redirect(url_for('admin.dashboard'))
+
+@admin_bp.route('/maintenance/force_update')
+@login_required
+@admin_required
+def force_db_update():
+    try:
+        # Force table creation
+        db.create_all()
+        
+        # Verify if lost_item exists now
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        tables = inspector.get_table_names()
+        
+        if 'lost_item' in tables:
+            flash(f'SUCESSO: Tabela "lost_item" e outras foram criadas/verificadas! (Tabelas: {len(tables)})', 'success')
+        else:
+            flash('AVISO: Comando rodou, mas tabela "lost_item" ainda não aparece.', 'warning')
+            
+    except Exception as e:
+        flash(f'ERRO CRÍTICO ao atualizar banco: {str(e)}', 'danger')
+        
+    return redirect(url_for('admin.dashboard'))
