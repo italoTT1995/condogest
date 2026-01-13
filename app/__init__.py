@@ -76,6 +76,9 @@ def create_app(config_class=Config):
     from app.views.deliveries import deliveries_bp
     app.register_blueprint(deliveries_bp, url_prefix='/deliveries')
 
+    from app.views.lost_found import lost_found_bp
+    app.register_blueprint(lost_found_bp, url_prefix='/lost_found')
+
     from app.views.financial import financial_bp
     app.register_blueprint(financial_bp, url_prefix='/financial')
 
