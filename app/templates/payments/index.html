@@ -24,7 +24,8 @@
                         <th class="ps-4 text-muted small text-uppercase font-monospace border-0 py-3">Vencimento</th>
                         <th class="text-muted small text-uppercase font-monospace border-0 py-3">Descrição</th>
                         {% if current_user.is_admin %}<th
-                            class="text-muted small text-uppercase font-monospace border-0 py-3">Morador</th>{% endif %}
+                            class="text-muted small text-uppercase font-monospace border-0 py-3">Unidade / Pagador</th>
+                        {% endif %}
                         <th class="text-muted small text-uppercase font-monospace border-0 py-3">Valor</th>
                         <th class="text-muted small text-uppercase font-monospace border-0 py-3">Status</th>
                         <th class="text-end pe-4 text-muted small text-uppercase font-monospace border-0 py-3">Ações
@@ -41,7 +42,19 @@
                             </div>
                         </td>
                         <td>{{ payment.description }}</td>
-                        {% if current_user.is_admin %}<td>{{ payment.resident.username }}</td>{% endif %}
+                        {% if current_user.is_admin %}
+                        <td>
+                            {% if payment.unit %}
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-building"></i> {{ payment.unit.block }}-{{ payment.unit.number }}
+                            </span>
+                            {% elif payment.user %}
+                            <span>{{ payment.user.username }}</span>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
                         <td class="fw-bold">R$ {{ "%.2f"|format(payment.amount) }}</td>
                         <td>
                             {% if payment.status == 'pending' %}
