@@ -30,26 +30,30 @@ def index():
         # Admin sees strict silo of active condo
         ticket_count = Ticket.query.join(User).filter(User.condo_id == condo_id, Ticket.status == 'open').count()
         
-        pending_payments = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'pending').count()
-        payment_amount = pending_payments 
-        next_payment = None
-    else:
-        # Resident logic remains same (sees own data)
-        ticket_count = Ticket.query.filter_by(user_id=current_user.id, status='open').count()
-        
-        # Payments: Show by Unit OR by User (legacy/assigned)
-        if current_user.unit_id:
-            payments = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').all()
+    # Defensive: Payments Summary
+    try:
+        if current_user.is_admin:
+            pending_payments = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'pending').count()
+            payment_amount = pending_payments # Logic seems odd in original but keeping for safety/count context
+            next_payment = None
         else:
-            payments = Payment.query.filter_by(user_id=current_user.id, status='pending').all()
+             # Payments: Show by Unit OR by User (legacy/assigned)
+            if current_user.unit_id:
+                payments = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').all()
+            else:
+                payments = Payment.query.filter_by(user_id=current_user.id, status='pending').all()
+                
+            payment_amount = sum(p.amount for p in payments)
+            pending_payments = len(payments)
             
-        payment_amount = sum(p.amount for p in payments)
-        pending_payments = len(payments)
-        
-        if current_user.unit_id:
-            next_payment = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').order_by(Payment.due_date).first()
-        else:
-            next_payment = Payment.query.filter_by(user_id=current_user.id, status='pending').order_by(Payment.due_date).first()
+            if current_user.unit_id:
+                next_payment = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').order_by(Payment.due_date).first()
+            else:
+                next_payment = Payment.query.filter_by(user_id=current_user.id, status='pending').order_by(Payment.due_date).first()
+    except Exception:
+        pending_payments = 0
+        payment_amount = 0
+        next_payment = None
 
     # Notices: Filter by condo of author? Or if we add condo_id to Notice? 
     # For now, let's filter by author's condo.
@@ -72,22 +76,33 @@ def index():
     }
 
     # Payment stats for chart
-    if current_user.is_admin:
-        pending_objs = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'pending').all()
-        paid_objs = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'paid').all()
-    else:
-        if current_user.unit_id:
-            pending_objs = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').all()
-            paid_objs = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'paid').all()
+    # Payment stats (Defensive coding for migration)
+    try:
+        if current_user.is_admin:
+            pending_objs = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'pending').all()
+            paid_objs = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'paid').all()
         else:
-            pending_objs = Payment.query.filter_by(user_id=current_user.id, status='pending').all()
-            paid_objs = Payment.query.filter_by(user_id=current_user.id, status='paid').all()
-    
-    payment_stats = {
-        'pending_count': len(pending_objs),
-        'paid_count': len(paid_objs),
-        'pending_val': sum(p.amount for p in pending_objs)
-    }
+            if current_user.unit_id:
+                pending_objs = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').all()
+                paid_objs = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'paid').all()
+            else:
+                pending_objs = Payment.query.filter_by(user_id=current_user.id, status='pending').all()
+                paid_objs = Payment.query.filter_by(user_id=current_user.id, status='paid').all()
+        
+        payment_stats = {
+            'pending_count': len(pending_objs),
+            'paid_count': len(paid_objs),
+            'pending_val': sum(p.amount for p in pending_objs)
+        }
+    except Exception as e:
+        print(f"Payment Query Error (Likely Migration Needed): {e}")
+        payment_stats = {
+            'pending_count': 0, 'paid_count': 0, 'pending_val': 0.0
+        }
+        # Provide feedback to admin
+        if current_user.is_admin:
+             from flask import flash
+             flash('AVISO CRÍTICO: Banco de dados desatualizado (Pagamentos). Execute a manutenção.', 'danger')
 
     # Visitor Stats (Admin, Porteiro, Síndico)
     # Check if user has permission to view visitor stats
