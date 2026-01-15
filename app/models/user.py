@@ -47,7 +47,7 @@ class User(UserMixin, db.Model):
     
     tickets = db.relationship('Ticket', backref='author', lazy='dynamic')
     # Payments made by this user (History)
-    payments_made = db.relationship('Payment', backref='payer', lazy='dynamic')
+    payments_made = db.relationship('Payment', backref='user', lazy='dynamic')
     reservations = db.relationship('Reservation', backref='resident', lazy='dynamic')
 
     def set_password(self, password):

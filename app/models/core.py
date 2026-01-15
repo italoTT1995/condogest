@@ -54,7 +54,10 @@ class Payment(db.Model):
     unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'), nullable=True) # New: Link to Unit
     condo_id = db.Column(db.Integer, db.ForeignKey('condominium.id'), nullable=True)
 
-    user = db.relationship('User', foreign_keys=[user_id])
+    # Relationships defined in User model via backref
+    # user = db.relationship('User', foreign_keys=[user_id]) 
+    
+    # Unit relationship
     unit = db.relationship('Unit', foreign_keys=[unit_id])
 
     def __repr__(self):
