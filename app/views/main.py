@@ -36,10 +36,20 @@ def index():
     else:
         # Resident logic remains same (sees own data)
         ticket_count = Ticket.query.filter_by(user_id=current_user.id, status='open').count()
-        payments = Payment.query.filter_by(user_id=current_user.id, status='pending').all()
+        
+        # Payments: Show by Unit OR by User (legacy/assigned)
+        if current_user.unit_id:
+            payments = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').all()
+        else:
+            payments = Payment.query.filter_by(user_id=current_user.id, status='pending').all()
+            
         payment_amount = sum(p.amount for p in payments)
         pending_payments = len(payments)
-        next_payment = Payment.query.filter_by(user_id=current_user.id, status='pending').order_by(Payment.due_date).first()
+        
+        if current_user.unit_id:
+            next_payment = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').order_by(Payment.due_date).first()
+        else:
+            next_payment = Payment.query.filter_by(user_id=current_user.id, status='pending').order_by(Payment.due_date).first()
 
     # Notices: Filter by condo of author? Or if we add condo_id to Notice? 
     # For now, let's filter by author's condo.
@@ -66,8 +76,12 @@ def index():
         pending_objs = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'pending').all()
         paid_objs = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'paid').all()
     else:
-        pending_objs = Payment.query.filter_by(user_id=current_user.id, status='pending').all()
-        paid_objs = Payment.query.filter_by(user_id=current_user.id, status='paid').all()
+        if current_user.unit_id:
+            pending_objs = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').all()
+            paid_objs = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'paid').all()
+        else:
+            pending_objs = Payment.query.filter_by(user_id=current_user.id, status='pending').all()
+            paid_objs = Payment.query.filter_by(user_id=current_user.id, status='paid').all()
     
     payment_stats = {
         'pending_count': len(pending_objs),

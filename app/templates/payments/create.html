@@ -5,12 +5,11 @@
 <form method="post" class="mt-4">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <div class="mb-3">
-        <label for="user_id" class="form-label">Morador</label>
-        <select class="form-select" id="user_id" name="user_id" required>
+        <label for="unit_id" class="form-label">Unidade (Bloco/Apartamento)</label>
+        <select class="form-select" id="unit_id" name="unit_id" required>
             <option value="">Selecione...</option>
-            {% for user in users %}
-            <option value="{{ user.id }}">{{ user.username }} (Unid: {{ user.unit.block if user.unit else '?' }}-{{
-                user.unit.number if user.unit else '?' }})</option>
+            {% for unit in units %}
+            <option value="{{ unit.id }}">Bloco {{ unit.block }} - {{ unit.number }}</option>
             {% endfor %}
         </select>
     </div>

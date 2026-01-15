@@ -50,8 +50,12 @@ class Payment(db.Model):
     amount = db.Column(db.Float, nullable=False)
     due_date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(20), default='pending') # pending, paid, overdue
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Now optional (payer)
+    unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'), nullable=True) # New: Link to Unit
     condo_id = db.Column(db.Integer, db.ForeignKey('condominium.id'), nullable=True)
 
+    user = db.relationship('User', foreign_keys=[user_id])
+    unit = db.relationship('Unit', foreign_keys=[unit_id])
+
     def __repr__(self):
-        return f'<Payment {self.amount} for {self.user_id}>'
+        return f'<Payment {self.amount} for Unit {self.unit_id}>'

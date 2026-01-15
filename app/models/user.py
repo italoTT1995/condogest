@@ -46,7 +46,8 @@ class User(UserMixin, db.Model):
     condo_id = db.Column(db.Integer, db.ForeignKey('condominium.id'), nullable=True) # Nullable for migration
     
     tickets = db.relationship('Ticket', backref='author', lazy='dynamic')
-    payments = db.relationship('Payment', backref='resident', lazy='dynamic')
+    # Payments made by this user (History)
+    payments_made = db.relationship('Payment', backref='payer', lazy='dynamic')
     reservations = db.relationship('Reservation', backref='resident', lazy='dynamic')
 
     def set_password(self, password):
