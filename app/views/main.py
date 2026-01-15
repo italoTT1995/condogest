@@ -33,8 +33,9 @@ def index():
     # Defensive: Payments Summary
     try:
         if current_user.is_admin:
-            pending_payments = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'pending').count()
-            payment_amount = pending_payments # Logic seems odd in original but keeping for safety/count context
+            # Use Payment.condo_id directly (includes Unit-based payments)
+            pending_payments = Payment.query.filter_by(condo_id=condo_id, status='pending').count()
+            payment_amount = pending_payments 
             next_payment = None
         else:
              # Payments: Show by Unit OR by User (legacy/assigned)
@@ -79,8 +80,9 @@ def index():
     # Payment stats (Defensive coding for migration)
     try:
         if current_user.is_admin:
-            pending_objs = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'pending').all()
-            paid_objs = Payment.query.join(User).filter(User.condo_id == condo_id, Payment.status == 'paid').all()
+            # Use Payment.condo_id directly
+            pending_objs = Payment.query.filter_by(condo_id=condo_id, status='pending').all()
+            paid_objs = Payment.query.filter_by(condo_id=condo_id, status='paid').all()
         else:
             if current_user.unit_id:
                 pending_objs = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id), Payment.status == 'pending').all()
