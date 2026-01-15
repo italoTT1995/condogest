@@ -11,18 +11,39 @@ payments_bp = Blueprint('payments', __name__)
 @payments_bp.route('/')
 @login_required
 def index():
-    if current_user.is_admin:
-        from flask import session
-        condo_id = session.get('active_condo_id')
-        payments = Payment.query.filter_by(condo_id=condo_id).order_by(Payment.due_date.desc()).all()
-    else:
-        # Resident sees payments for their UNIT or explicitly assigned to them
-        if current_user.unit_id:
-            payments = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id)).order_by(Payment.due_date.desc()).all()
+    try:
+        if current_user.is_admin:
+            from flask import session
+            condo_id = session.get('active_condo_id')
+            payments = Payment.query.filter_by(condo_id=condo_id).order_by(Payment.due_date.desc()).all()
         else:
-            payments = Payment.query.filter_by(user_id=current_user.id).order_by(Payment.due_date.desc()).all()
+            # Resident sees payments for their UNIT or explicitly assigned to them
+            if current_user.unit_id:
+                payments = Payment.query.filter((Payment.unit_id == current_user.unit_id) | (Payment.user_id == current_user.id)).order_by(Payment.due_date.desc()).all()
+            else:
+                payments = Payment.query.filter_by(user_id=current_user.id).order_by(Payment.due_date.desc()).all()
 
-    return render_template('payments/index.html', payments=payments)
+        return render_template('payments/index.html', payments=payments)
+    except Exception as e:
+        # Auto-Healing: Recovery from missing column error
+        error_str = str(e).lower()
+        if 'unit_id' in error_str or 'column' in error_str:
+            try:
+                from sqlalchemy import text
+                with db.engine.connect() as conn:
+                    # Attempt to fix the schema
+                    conn.execute(text("ALTER TABLE payment ADD COLUMN IF NOT EXISTS unit_id INTEGER REFERENCES unit(id)"))
+                    conn.execute(text("ALTER TABLE payment ALTER COLUMN user_id DROP NOT NULL"))
+                    conn.commit()
+                flash('Sistema de pagamentos atualizado automaticamente! Tente novamente.', 'success')
+                return redirect(url_for('payments.index'))
+            except Exception as migration_error:
+                flash(f'Erro ao corrigir banco de dados: {str(migration_error)}', 'danger')
+        else:
+            flash(f'Erro desconhecido: {str(e)}', 'danger')
+            print(f"Payment Error: {e}")
+        
+        return redirect(url_for('main.index'))
 
 @payments_bp.route('/new', methods=['GET', 'POST'])
 @login_required
