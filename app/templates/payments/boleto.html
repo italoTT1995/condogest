@@ -23,9 +23,20 @@
                             CNPJ: 00.000.000/0001-00
                         </div>
                         <div class="col-6 text-end">
-                            <strong>Pagador:</strong><br>
-                            {{ payment.user.username }}<br>
-                            Unidade: {{ payment.user.unit.block }} - {{ payment.user.unit.number }}
+                            <h5 class="card-title fw-bold text-dark">
+                                {% if payment.unit %}
+                                Unidade {{ payment.unit.block }} - {{ payment.unit.number }}
+                                {% else %}
+                                {{ payment.user.username }}
+                                {% endif %}
+                            </h5>
+                            <small class="text-muted">
+                                {% if payment.unit %}
+                                Pagador: {{ payment.user.username if payment.user else 'Responsável da Unidade' }}
+                                {% elif payment.user and payment.user.unit %}
+                                Unidade: {{ payment.user.unit.block }} - {{ payment.user.unit.number }}
+                                {% endif %}
+                            </small><br>
                         </div>
                     </div>
 
