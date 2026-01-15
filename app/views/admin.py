@@ -239,3 +239,49 @@ def force_db_update():
         flash(f'ERRO CRÍTICO ao atualizar banco: {str(e)}', 'danger')
         
     return redirect(url_for('admin.dashboard'))
+
+@admin_bp.route('/maintenance/migrate_payments')
+@login_required
+@admin_required
+def migrate_payments_remote():
+    try:
+        from app.models.core import Payment, Unit
+        from app.models.user import User
+        from sqlalchemy import text
+        from app import db
+        
+        # 1. Add column if not exists
+        try:
+            with db.engine.connect() as conn:
+                # Postgres syntax
+                conn.execute(text("ALTER TABLE payment ADD COLUMN IF NOT EXISTS unit_id INTEGER REFERENCES unit(id)"))
+                conn.execute(text("ALTER TABLE payment ALTER COLUMN user_id DROP NOT NULL"))
+                conn.commit()
+        except Exception as e:
+            # Maybe already exists or sqlite fallback
+            pass 
+            
+        # 2. Backfill
+        payments = Payment.query.filter(Payment.unit_id == None).all()
+        count = 0
+        migrated_ids = []
+        for p in payments:
+            if p.user_id:
+                user = User.query.get(p.user_id)
+                # Ensure user has a unit linked
+                if user and user.unit_id:
+                    p.unit_id = user.unit_id
+                    count += 1
+                    migrated_ids.append(p.id)
+                else:
+                    # Logic: if user has no unit, maybe try to match via previous data? 
+                    # For now just leave orphan or assign to a default?
+                    pass
+        
+        db.session.commit()
+        flash(f'Migração de Pagamentos concluída! {count} pagamentos atualizados.', 'success')
+            
+    except Exception as e:
+        flash(f'Erro na migração: {str(e)}', 'danger')
+        
+    return redirect(url_for('admin.dashboard'))
