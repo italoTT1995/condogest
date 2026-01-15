@@ -128,14 +128,14 @@ def export_financial():
     cw.writerow(['Tipo', 'Morador', 'Unidade', 'Descricao', 'Valor', 'Data'])
     
     for p in received:
-        unit = f"{p.resident.unit.block}-{p.resident.unit.number}" if p.resident.unit else "N/A"
-        cw.writerow(['Recebido', p.resident.username, unit, p.description, 
-                     str(p.amount).replace('.', ','), p.due_date.strftime('%d/%m/%Y')])
+        unit = f"{p.unit.block}-{p.unit.number}" if p.unit else "N/A"
+        cw.writerow(['Recebido', p.user.username if p.user else 'Desconhecido', unit, p.description, 
+                     f"R$ {p.amount:.2f}", p.due_date.strftime('%d/%m/%Y')])
 
     for p in pending:
-        unit = f"{p.resident.unit.block}-{p.resident.unit.number}" if p.resident.unit else "N/A"
-        cw.writerow(['Pendente', p.resident.username, unit, p.description, 
-                     str(p.amount).replace('.', ','), p.due_date.strftime('%d/%m/%Y')])
+        unit = f"{p.unit.block}-{p.unit.number}" if p.unit else "N/A"
+        cw.writerow(['Pendente', p.user.username if p.user else 'Desconhecido', unit, p.description, 
+                     f"R$ {p.amount:.2f}", p.due_date.strftime('%d/%m/%Y')])
 
     output = make_response(si.getvalue())
     output.headers["Content-Disposition"] = f"attachment; filename=financeiro_{month}.csv"
