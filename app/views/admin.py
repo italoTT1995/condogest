@@ -205,8 +205,9 @@ def delete_user(id):
         from app.models.core import Ticket, Payment, Notice
         from app.models.amenity import Reservation
         from app.models.visitor import VisitLog
-        # Assumed Vehicle model existence and relationship
-        # from app.models.vehicle import Vehicle (if exists)
+        from app.models.vehicle import Vehicle
+        from app.models.notification import Notification, PushSubscription
+        from app.models.voting import Vote, Attendance
         
         # 1. Nullify Payments (Keep history linked to Unit)
         Payment.query.filter_by(user_id=user.id).update({'user_id': None})
@@ -218,29 +219,24 @@ def delete_user(id):
         VisitLog.query.filter_by(user_id=user.id).update({'user_id': None})
         VisitLog.query.filter_by(scheduled_by=user.id).update({'scheduled_by': None})
         
-        # 4. DELETE Personal Records (Tickets, Reservations)
-        # Tickets are requests from THIS user, generally can be deleted or archived. 
-        # For simplicity and to free up space/references, we delete.
+        # 4. DELETE Personal Records (Constraint: nullable=False)
         Ticket.query.filter_by(user_id=user.id).delete()
-        
-        # Reservations for future/past
         Reservation.query.filter_by(user_id=user.id).delete()
+        Vehicle.query.filter_by(user_id=user.id).delete()
+        Notification.query.filter_by(user_id=user.id).delete()
+        PushSubscription.query.filter_by(user_id=user.id).delete()
         
-        # Vehicles (if any) - Assuming relationship exists on User or Vehicle model
-        # user.vehicles (dynamic)
-        if hasattr(user, 'vehicles'):
-             # If it's a dynamic relationship query
-             # user.vehicles.delete() # Might not work on dynamic directly without loop
-             pass # Alchemy often handles this if cascade is set, but let's leave it for now or check model.
-             
-        # If there is a separate Vehicle model, we should delete:
-        # Vehicle.query.filter_by(user_id=user.id).delete()
+        # 5. DELETE Voting/Assembly Records (Constraint: nullable=False)
+        Vote.query.filter_by(user_id=user.id).delete()
+        Attendance.query.filter_by(user_id=user.id).delete()
         
         db.session.delete(user)
         db.session.commit()
-        flash('Usuário e dados vinculados excluídos com sucesso.', 'success')
+        flash('Usuário e todos os dados vinculados foram excluídos com sucesso.', 'success')
     except Exception as e:
         db.session.rollback()
+        # Log the full error for debugging (print to console which renders captures)
+        print(f"User Delete Error: {e}") 
         flash(f'Erro ao excluir usuário: {str(e)}', 'danger')
         
     return redirect(url_for('admin.dashboard'))
