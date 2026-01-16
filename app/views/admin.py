@@ -202,14 +202,17 @@ def delete_user(id):
         return redirect(url_for('admin.dashboard'))
     
     try:
+    try:
         from app.models.core import Ticket, Payment, Notice
         from app.models.amenity import Reservation
         from app.models.visitor import VisitLog
         from app.models.vehicle import Vehicle
         from app.models.notification import Notification, PushSubscription
         from app.models.voting import Vote, Attendance
+        from sqlalchemy.exc import ProgrammingError, OperationalError
         
         # 1. Nullify Payments (Keep history linked to Unit)
+        # These tables are CORE, should exist.
         Payment.query.filter_by(user_id=user.id).update({'user_id': None})
         
         # 2. Nullify Notices (Keep announcements)
@@ -222,13 +225,28 @@ def delete_user(id):
         # 4. DELETE Personal Records (Constraint: nullable=False)
         Ticket.query.filter_by(user_id=user.id).delete()
         Reservation.query.filter_by(user_id=user.id).delete()
-        Vehicle.query.filter_by(user_id=user.id).delete()
         Notification.query.filter_by(user_id=user.id).delete()
-        PushSubscription.query.filter_by(user_id=user.id).delete()
+        
+        # Optional Tables (Might not exist in Prod yet) - Defensive Coding
+        try:
+             with db.session.begin_nested():
+                Vehicle.query.filter_by(user_id=user.id).delete()
+        except Exception:
+             pass
+
+        try:
+             with db.session.begin_nested():
+                PushSubscription.query.filter_by(user_id=user.id).delete()
+        except Exception:
+             pass
         
         # 5. DELETE Voting/Assembly Records (Constraint: nullable=False)
-        Vote.query.filter_by(user_id=user.id).delete()
-        Attendance.query.filter_by(user_id=user.id).delete()
+        try:
+             with db.session.begin_nested():
+                Vote.query.filter_by(user_id=user.id).delete()
+                Attendance.query.filter_by(user_id=user.id).delete()
+        except Exception:
+             pass
         
         db.session.delete(user)
         db.session.commit()
