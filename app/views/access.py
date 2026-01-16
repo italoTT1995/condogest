@@ -95,21 +95,13 @@ def verify():
         # 1. Check Financial Status - REMOVED AS REQUESTED
         # (Former logic checked for overdue payments here)
 
-        if not user.is_active: 
-             # Simple ban check placeholder (currently defaults to allowed)
-             status = 'allowed' 
-             message = 'Acesso Autorizado.'
-             failure_reason = None
+        if hasattr(user, 'is_active') and not user.is_active: 
+             # Block inactive users (if logic implemented)
+             status = 'denied'
+             message = 'Usuário Inativo.'
+             failure_reason = 'inactive_user'
         else:
-            status = 'allowed'
-            message = 'Acesso Autorizado.'
-            failure_reason = None
-        elif not user.is_active: # Assuming is_active property exists or logic needs to be added
-             # Simple ban check placeholder
-             status = 'allowed' # default allowed if no explicit ban logic yet
-             message = 'Acesso Autorizado.'
-             failure_reason = None
-        else:
+             # Default Allow
             status = 'allowed'
             message = 'Acesso Autorizado.'
             failure_reason = None
