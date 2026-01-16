@@ -92,38 +92,18 @@ def verify():
                 
                 return render_template('access/result.html', status=status, message=message, user_data=user)
 
-        # 1. Check Financial Status
-        overdue = Payment.query.filter(
-            Payment.user_id == user.id,
-            Payment.status != 'paid',
-            Payment.due_date < datetime.now().date()
-        ).count()
-        
-        if overdue > 0:
-            # ALERT MODE: Allow access but log warning
+        # 1. Check Financial Status - REMOVED AS REQUESTED
+        # (Former logic checked for overdue payments here)
+
+        if not user.is_active: 
+             # Simple ban check placeholder (currently defaults to allowed)
+             status = 'allowed' 
+             message = 'Acesso Autorizado.'
+             failure_reason = None
+        else:
             status = 'allowed'
-            message = 'Acesso Autorizado (Com Alerta de Pendência).'
-            failure_reason = 'Alerta: Pendência Financeira'
-            
-            # Notify Resident
-            from app.models.notification import Notification
-            notif_res = Notification(
-                user_id=user.id,
-                message=f'Seu acesso foi registrado, mas constam pendências financeiras. Por favor, contate a administração.'
-            )
-            db.session.add(notif_res)
-            
-            # Notify Admins/Sindicos
-            from app.models.user import User
-            admins = User.query.filter(User.role.in_(['admin', 'sindico'])).all()
-            for admin in admins:
-                notif_admin = Notification(
-                    user_id=admin.id,
-                    message=f'ALERTA ACESSO: {user.username} (Unidade {user.unit_id}) entrou com pendências financeiras.'
-                )
-                db.session.add(notif_admin)
-                
-            db.session.commit()
+            message = 'Acesso Autorizado.'
+            failure_reason = None
         elif not user.is_active: # Assuming is_active property exists or logic needs to be added
              # Simple ban check placeholder
              status = 'allowed' # default allowed if no explicit ban logic yet

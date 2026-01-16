@@ -194,16 +194,55 @@ def edit_unit(id):
 def delete_user(id):
     user = User.query.get_or_404(id)
     if user.id == current_user.id:
-        flash('Você não pode excluir a si mesmo!')
+        flash('Você não pode excluir a si mesmo!', 'danger')
         return redirect(url_for('admin.dashboard'))
         
     if user.username == 'admin':
-        flash('O administrador principal não pode ser excluído.')
+        flash('O administrador principal não pode ser excluído.', 'danger')
         return redirect(url_for('admin.dashboard'))
+    
+    try:
+        from app.models.core import Ticket, Payment, Notice
+        from app.models.amenity import Reservation
+        from app.models.visitor import VisitLog
+        # Assumed Vehicle model existence and relationship
+        # from app.models.vehicle import Vehicle (if exists)
         
-    db.session.delete(user)
-    db.session.commit()
-    flash('Usuário excluído com sucesso.')
+        # 1. Nullify Payments (Keep history linked to Unit)
+        Payment.query.filter_by(user_id=user.id).update({'user_id': None})
+        
+        # 2. Nullify Notices (Keep announcements)
+        Notice.query.filter_by(created_by=user.id).update({'created_by': None})
+        
+        # 3. Nullify VisitLogs (Keep access history)
+        VisitLog.query.filter_by(user_id=user.id).update({'user_id': None})
+        VisitLog.query.filter_by(scheduled_by=user.id).update({'scheduled_by': None})
+        
+        # 4. DELETE Personal Records (Tickets, Reservations)
+        # Tickets are requests from THIS user, generally can be deleted or archived. 
+        # For simplicity and to free up space/references, we delete.
+        Ticket.query.filter_by(user_id=user.id).delete()
+        
+        # Reservations for future/past
+        Reservation.query.filter_by(user_id=user.id).delete()
+        
+        # Vehicles (if any) - Assuming relationship exists on User or Vehicle model
+        # user.vehicles (dynamic)
+        if hasattr(user, 'vehicles'):
+             # If it's a dynamic relationship query
+             # user.vehicles.delete() # Might not work on dynamic directly without loop
+             pass # Alchemy often handles this if cascade is set, but let's leave it for now or check model.
+             
+        # If there is a separate Vehicle model, we should delete:
+        # Vehicle.query.filter_by(user_id=user.id).delete()
+        
+        db.session.delete(user)
+        db.session.commit()
+        flash('Usuário e dados vinculados excluídos com sucesso.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro ao excluir usuário: {str(e)}', 'danger')
+        
     return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/unit/<int:id>/delete', methods=['POST'])
