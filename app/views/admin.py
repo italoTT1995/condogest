@@ -245,8 +245,12 @@ def delete_user(id):
         if 'attendance' in existing_tables:
             Attendance.query.filter_by(user_id=user.id).delete()
         
-        db.session.delete(user)
+        # Final Step: Delete User using RAW SQL to bypass SQLAlchemy ORM Cascade checks
+        # (This avoids errors if 'push_subscriptions' table is missing but model relationship exists)
+        from sqlalchemy import text
+        db.session.execute(text('DELETE FROM "user" WHERE id = :id'), {'id': user.id})
         db.session.commit()
+        
         flash('Usuário e todos os dados vinculados foram excluídos com sucesso.', 'success')
     except Exception as e:
         db.session.rollback()
