@@ -202,7 +202,6 @@ def delete_user(id):
         return redirect(url_for('admin.dashboard'))
     
     try:
-    try:
         from app.models.core import Ticket, Payment, Notice
         from app.models.amenity import Reservation
         from app.models.visitor import VisitLog
