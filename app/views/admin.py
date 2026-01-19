@@ -227,26 +227,24 @@ def delete_user(id):
         Reservation.query.filter_by(user_id=user.id).delete()
         Notification.query.filter_by(user_id=user.id).delete()
         
-        # Optional Tables (Might not exist in Prod yet) - Defensive Coding
-        try:
-             with db.session.begin_nested():
-                Vehicle.query.filter_by(user_id=user.id).delete()
-        except Exception:
-             pass
-
-        try:
-             with db.session.begin_nested():
-                PushSubscription.query.filter_by(user_id=user.id).delete()
-        except Exception:
-             pass
+        # Optional Tables - Check existence first
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        existing_tables = inspector.get_table_names()
         
-        # 5. DELETE Voting/Assembly Records (Constraint: nullable=False)
-        try:
-             with db.session.begin_nested():
-                Vote.query.filter_by(user_id=user.id).delete()
-                Attendance.query.filter_by(user_id=user.id).delete()
-        except Exception:
-             pass
+        # Vehicle
+        if 'vehicle' in existing_tables:
+            Vehicle.query.filter_by(user_id=user.id).delete()
+            
+        # PushSubscription
+        if 'push_subscriptions' in existing_tables:
+            PushSubscription.query.filter_by(user_id=user.id).delete()
+
+        # Voting
+        if 'vote' in existing_tables:
+            Vote.query.filter_by(user_id=user.id).delete()
+        if 'attendance' in existing_tables:
+            Attendance.query.filter_by(user_id=user.id).delete()
         
         db.session.delete(user)
         db.session.commit()
