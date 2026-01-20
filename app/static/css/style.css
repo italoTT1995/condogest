@@ -279,3 +279,76 @@ a {
 [data-theme="dark"] .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
 }
+
+/* --- Login Page Styles (Restored & Modernized) --- */
+.login-page-body {
+    background-color: var(--bg-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-content-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-card-modern {
+    background: var(--bg-surface);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    padding: 3rem;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.login-logo {
+    max-height: 120px;
+    /* Reduced from 280px to fix hugeness */
+    width: auto;
+    margin-bottom: 1rem;
+}
+
+.input-icon-group {
+    position: relative;
+}
+
+.input-icon-group i {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 10;
+}
+
+.input-icon-group .form-control {
+    padding-left: 45px;
+    /* Space for icon */
+    height: 50px;
+    border-radius: 8px;
+    background-color: var(--bg-surface-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.input-icon-group .form-control:focus {
+    background-color: var(--bg-surface);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+}
+
+/* Ensure buttons and links look good in dark mode */
+.login-card-modern a {
+    color: var(--primary-color);
+}
+
+.login-card-modern .text-muted {
+    color: var(--text-muted) !important;
+}
