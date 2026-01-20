@@ -106,6 +106,12 @@ def create_app(config_class=Config):
     from app.views.condos import condos_bp
     app.register_blueprint(condos_bp, url_prefix='/condos')
 
+    from app.views.marketplace import marketplace_bp
+    app.register_blueprint(marketplace_bp, url_prefix='/marketplace')
+
+    from app.views.services import services_bp
+    app.register_blueprint(services_bp, url_prefix='/services')
+
     # Context Processor for Notifications
     from app.models.notification import Notification
     from flask_login import current_user

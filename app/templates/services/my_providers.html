@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">🧹 Meus Prestadores</h2>
+            <p class="text-muted small">Gerencie as pessoas que trabalham na sua unidade</p>
+        </div>
+        <a href="{{ url_for('services.new') }}" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-person-plus me-2"></i>Novo Prestador
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 border-0 rounded-start-top-4">Nome</th>
+                            <th class="py-3 border-0">Função</th>
+                            <th class="py-3 border-0">Dias Permitidos</th>
+                            <th class="py-3 border-0">Status</th>
+                            <th class="pe-4 py-3 text-end border-0 rounded-end-top-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% ifProviders %}
+                        {% for provider in providers %}
+                        <tr>
+                            <td class="ps-4 fw-bold text-dark">{{ provider.name }}</td>
+                            <td><span class="badge bg-secondary bg-opacity-10 text-secondary">{{ provider.role }}</span>
+                            </td>
+                            <td>
+                                <!-- Simple badges for days -->
+                                {% if 'Seg' in provider.allowed_days or 'Mon' in provider.allowed_days %}<span
+                                    class="badge bg-info bg-opacity-10 text-info me-1">Seg</span>{% endif %}
+                                {% if 'Ter' in provider.allowed_days or 'Tue' in provider.allowed_days %}<span
+                                    class="badge bg-info bg-opacity-10 text-info me-1">Ter</span>{% endif %}
+                                {% if 'Qua' in provider.allowed_days or 'Wed' in provider.allowed_days %}<span
+                                    class="badge bg-info bg-opacity-10 text-info me-1">Qua</span>{% endif %}
+                                {% if 'Qui' in provider.allowed_days or 'Thu' in provider.allowed_days %}<span
+                                    class="badge bg-info bg-opacity-10 text-info me-1">Qui</span>{% endif %}
+                                {% if 'Sex' in provider.allowed_days or 'Fri' in provider.allowed_days %}<span
+                                    class="badge bg-info bg-opacity-10 text-info me-1">Sex</span>{% endif %}
+                                {% if 'Sab' in provider.allowed_days or 'Sat' in provider.allowed_days %}<span
+                                    class="badge bg-warning bg-opacity-10 text-warning me-1">Sab</span>{% endif %}
+                                {% if 'Dom' in provider.allowed_days or 'Sun' in provider.allowed_days %}<span
+                                    class="badge bg-danger bg-opacity-10 text-danger me-1">Dom</span>{% endif %}
+                            </td>
+                            <td><span class="badge bg-success bg-opacity-10 text-success">Ativo</span></td>
+                            <td class="pe-4 text-end">
+                                <form action="{{ url_for('services.delete', id=provider.id) }}" method="POST"
+                                    onsubmit="return confirm('Remover este prestador?');" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle"
+                                        title="Remover"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-people fs-1 d-block mb-3 opacity-25"></i>
+                                Nenhum prestador cadastrado.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

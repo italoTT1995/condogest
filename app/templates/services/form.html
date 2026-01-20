@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 text-center">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-person-vcard fs-3"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark">Cadastrar Prestador</h4>
+                    <p class="text-muted small">Autorize a entrada de funcionários na sua unidade</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nome Completo</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" name="name"
+                                required autofocus>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Função</label>
+                                <select class="form-select bg-light border-0" name="role" required>
+                                    <option value="Diarista">Diarista</option>
+                                    <option value="Babá">Babá</option>
+                                    <option value="Personal Trainer">Personal Trainer</option>
+                                    <option value="Professor">Professor Particular</option>
+                                    <option value="Enfermeiro(a)">Enfermeiro(a)</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">CPF</label>
+                                <input type="text" class="form-control bg-light border-0" name="cpf"
+                                    placeholder="000.000.000-00">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold d-block mb-2">Dias Permitidos de Acesso</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <input type="checkbox" class="btn-check" id="dayMon" name="days" value="Seg"
+                                    autocomplete="off">
+                                <label class="btn btn-outline-primary rounded-pill px-3" for="dayMon">Segunda</label>
+
+                                <input type="checkbox" class="btn-check" id="dayTue" name="days" value="Ter"
+                                    autocomplete="off">
+                                <label class="btn btn-outline-primary rounded-pill px-3" for="dayTue">Terça</label>
+
+                                <input type="checkbox" class="btn-check" id="dayWed" name="days" value="Qua"
+                                    autocomplete="off">
+                                <label class="btn btn-outline-primary rounded-pill px-3" for="dayWed">Quarta</label>
+
+                                <input type="checkbox" class="btn-check" id="dayThu" name="days" value="Qui"
+                                    autocomplete="off">
+                                <label class="btn btn-outline-primary rounded-pill px-3" for="dayThu">Quinta</label>
+
+                                <input type="checkbox" class="btn-check" id="dayFri" name="days" value="Sex"
+                                    autocomplete="off">
+                                <label class="btn btn-outline-primary rounded-pill px-3" for="dayFri">Sexta</label>
+
+                                <input type="checkbox" class="btn-check" id="daySat" name="days" value="Sab"
+                                    autocomplete="off">
+                                <label class="btn btn-outline-warning rounded-pill px-3 text-dark"
+                                    for="daySat">Sábado</label>
+
+                                <input type="checkbox" class="btn-check" id="daySun" name="days" value="Dom"
+                                    autocomplete="off">
+                                <label class="btn btn-outline-danger rounded-pill px-3" for="daySun">Domingo</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold">Cadastrar</button>
+                            <a href="{{ url_for('services.index') }}"
+                                class="btn btn-light btn-lg rounded-pill text-muted">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
