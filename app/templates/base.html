@@ -233,6 +233,12 @@
                   <span class="d-none d-md-inline">Transparência</span>
                 </a>
               </li>
+              <!-- Theme Toggle -->
+              <li class="nav-item px-2">
+                <button class="btn nav-link border-0" id="themeToggle" title="Alternar Tema">
+                  <i class="bi bi-moon-stars"></i>
+                </button>
+              </li>
               <!-- Notification Bell -->
               <li class="nav-item dropdown px-2 text-center text-md-start">
                 <a class="nav-link position-relative px-0" href="#" id="navbarDropdown" role="button"
@@ -389,6 +395,40 @@
         }
       });
     }
+
+    // Theme Toggle Logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtn = document.getElementById('themeToggle');
+      const icon = toggleBtn.querySelector('i');
+      const root = document.documentElement;
+
+      // Check saved or preference
+      const savedTheme = localStorage.getItem('theme');
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      let currentTheme = savedTheme || (systemDark ? 'dark' : 'light');
+
+      // Apply initial
+      root.setAttribute('data-theme', currentTheme);
+      updateIcon(currentTheme);
+
+      toggleBtn.addEventListener('click', () => {
+        currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', currentTheme);
+        localStorage.setItem('theme', currentTheme);
+        updateIcon(currentTheme);
+      });
+
+      function updateIcon(theme) {
+        if (theme === 'dark') {
+          icon.classList.remove('bi-moon-stars');
+          icon.classList.add('bi-sun-fill');
+        } else {
+          icon.classList.remove('bi-sun-fill');
+          icon.classList.add('bi-moon-stars');
+        }
+      }
+    });
   </script>
 </body>
 
