@@ -112,6 +112,9 @@ def create_app(config_class=Config):
     from app.views.services import services_bp
     app.register_blueprint(services_bp, url_prefix='/services')
 
+    from app.views.maintenance import maintenance_bp
+    app.register_blueprint(maintenance_bp, url_prefix='/maintenance')
+
     # Context Processor for Notifications
     from app.models.notification import Notification
     from flask_login import current_user

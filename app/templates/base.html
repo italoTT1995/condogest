@@ -133,6 +133,14 @@
         </li>
         {% endif %}
 
+        {% if current_user.is_admin or current_user.is_zelador or current_user.is_sindico %}
+        <li class="{% if request.endpoint and 'maintenance' in request.endpoint %}active{% endif %}">
+          <a href="{{ url_for('maintenance.index') }}">
+            <i class="bi bi-tools"></i> Manutenção
+          </a>
+        </li>
+        {% endif %}
+
         <!-- Pagamentos / Financeiro -->
         {# Hide for Porteiro and Zelador #}
         {% if not current_user.is_porteiro and not current_user.is_zelador %}

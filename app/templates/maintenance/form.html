@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 text-center">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-tools fs-3"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark">Agendar Manutenção</h4>
+                    <p class="text-muted small">Crie um lembrete para serviços no condomínio</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Título da Tarefa</label>
+                            <input type="text" class="form-control bg-light border-0" name="title"
+                                placeholder="Ex: Limpeza da Piscina" required autofocus>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Data de Vencimento</label>
+                            <input type="date" class="form-control bg-light border-0" name="due_date" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Descrição (Opcional)</label>
+                            <textarea class="form-control bg-light border-0" name="description" rows="3"
+                                placeholder="Detalhes sobre o serviço a ser realizado..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold">Salvar
+                                Tarefa</button>
+                            <a href="{{ url_for('maintenance.index') }}"
+                                class="btn btn-light btn-lg rounded-pill text-muted">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

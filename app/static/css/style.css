@@ -309,10 +309,9 @@ a {
 }
 
 .login-logo {
-    max-height: 120px;
-    /* Reduced from 280px to fix hugeness */
+    max-height: 250px;
     width: auto;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
 }
 
 .input-icon-group {
