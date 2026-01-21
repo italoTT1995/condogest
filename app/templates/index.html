@@ -29,7 +29,7 @@
                     <small class="text-muted">Chamados Abertos</small>
                 </div>
             </div>
-            <div class="card-footer bg-white border-0 rounded-bottom-4">
+            <div class="card-footer bg-transparent border-0 rounded-bottom-4">
                 <a href="{{ url_for('tickets.index') }}" class="text-decoration-none small fw-bold">Ver todos →</a>
             </div>
         </div>
@@ -53,7 +53,7 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="card-footer bg-white border-0 rounded-bottom-4">
+            <div class="card-footer bg-transparent border-0 rounded-bottom-4">
                 <a href="{{ url_for('payments.index') }}" class="text-decoration-none small fw-bold">Financeiro →</a>
             </div>
         </div>
@@ -73,7 +73,7 @@
                     <small class="text-muted">Visitantes Ativos</small>
                 </div>
             </div>
-            <div class="card-footer bg-white border-0 rounded-bottom-4">
+            <div class="card-footer bg-transparent border-0 rounded-bottom-4">
                 <a href="{{ url_for('visitors.index') }}" class="text-decoration-none small fw-bold">Portaria →</a>
             </div>
         </div>
@@ -92,7 +92,7 @@
                     <small class="text-muted">Novos Avisos</small>
                 </div>
             </div>
-            <div class="card-footer bg-white border-0 rounded-bottom-4">
+            <div class="card-footer bg-transparent border-0 rounded-bottom-4">
                 <a href="{{ url_for('notices.index') }}" class="text-decoration-none small fw-bold">Ler avisos →</a>
             </div>
         </div>
@@ -104,7 +104,8 @@
     <!-- Left Column: Big Charts -->
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm rounded-4 mb-4">
-            <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+            <div
+                class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
                 <h5 class="fw-bold mb-0">Visão Geral</h5>
                 <small class="text-muted">Estatísticas Mensais</small>
             </div>
@@ -161,7 +162,8 @@
     <div class="col-lg-4">
         <!-- Notices List -->
         <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+            <div
+                class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
                 <h5 class="fw-bold mb-0">Comunicados</h5>
                 <a href="{{ url_for('notices.index') }}" class="small text-decoration-none">Ver tudo</a>
             </div>
@@ -194,6 +196,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+    // Chart.js Theme Logic
+    function getChartColor() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' ? '#e0e0e0' : '#666';
+    }
+
+    // Capture theme changes (optional, typically requires reload or more complex listener, keeping simple for now)
+    const textColor = getChartColor();
+
     const commonOptions = {
         indexAxis: 'y', // Horizontal bars
         responsive: true,
@@ -202,8 +212,15 @@
         },
         maintainAspectRatio: false,
         scales: {
-            x: { beginAtZero: true, grid: { display: false } },
-            y: { grid: { display: false } }
+            x: {
+                beginAtZero: true,
+                grid: { display: false },
+                ticks: { color: textColor }
+            },
+            y: {
+                grid: { display: false },
+                ticks: { color: textColor }
+            }
         }
     };
 
@@ -265,8 +282,15 @@
             legend: { display: false }
         },
         scales: {
-            y: { beginAtZero: true, ticks: { precision: 0 } },
-            x: { grid: { display: false } }
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0, color: textColor },
+                grid: { color: document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { color: textColor }
+            }
         }
     }
     });
