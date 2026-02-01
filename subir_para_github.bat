@@ -5,7 +5,7 @@ echo   ENVIANDO CÓDIGO PARA O GITHUB (italoTT1995) 🚀
 echo ==========================================
 echo.
 echo 1. Verificando conexão...
-git remote set-url origin https://github.com/italoTT1995/condogest.git
+
 
 echo.
 echo 2. Preparando arquivos...
