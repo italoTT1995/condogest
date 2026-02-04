@@ -231,6 +231,58 @@
 
     new Chart(ctx, chartConfig);
     {% endif %}
+
+    // --- Restored Charts Logic ---
+    const commonOptions = {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: { legend: { display: false } },
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { color: '#A3AED0', font: { size: 11 } }
+            },
+            y: {
+                grid: { display: false },
+                ticks: { color: '#A3AED0', font: { size: 11 } }
+            }
+        },
+        elements: {
+            bar: { borderRadius: 10 }
+        }
+    };
+
+    const ctxTickets = document.getElementById('ticketsChart').getContext('2d');
+    new Chart(ctxTickets, {
+        type: 'bar',
+        data: {
+            labels: ['Aberto', 'Andamento', 'Concluído'],
+            datasets: [{
+                data: [{{ chart_data.open }}, {{ chart_data.progress }}, {{ chart_data.closed }}],
+        backgroundColor: ['#E31A1A', '#FFB547', '#05CD99'],
+        barPercentage: 0.5
+            }]
+        },
+        options: commonOptions
+    });
+
+    {% if not current_user.is_porteiro %}
+    const ctxPayments = document.getElementById('paymentsChart').getContext('2d');
+    new Chart(ctxPayments, {
+        type: 'bar',
+        data: {
+            labels: ['Pendente', 'Pago'],
+            datasets: [{
+                data: [{{ payment_stats.pending_count }}, {{ payment_stats.paid_count }}],
+        backgroundColor: ['#FFB547', '#05CD99'],
+        barPercentage: 0.5
+    }]
+        },
+        options: commonOptions
+    });
+    {% endif %}
+
     });
 </script>
 {% endblock %}
