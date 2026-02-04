@@ -60,7 +60,8 @@ def index():
         # Notices: Filter by condo of author? Or if we add condo_id to Notice? 
         # For now, let's filter by author's condo.
         try:
-             recent_notices = Notice.query.join(User).filter(User.condo_id == condo_id).order_by(Notice.created_at.desc()).limit(3).all()
+             # Filter directly by condo_id stored on the Notice (more reliable)
+             recent_notices = Notice.query.filter_by(condo_id=condo_id).order_by(Notice.created_at.desc()).limit(4).all()
         except:
              recent_notices = []
         
