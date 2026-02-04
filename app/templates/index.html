@@ -1,193 +1,154 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Welcome / Hero Section -->
+<!-- Dashboard Header -->
 <div class="row align-items-center mb-4">
-    <div class="col-md-8">
-        <h2 class="fw-bold text-dark">Olá, {{ current_user.username }} 👋</h2>
-        <p class="text-muted">Bem-vindo ao seu painel de gerenciamento.</p>
-    </div>
-    <div class="col-md-4 text-end">
-        <div class="d-inline-flex align-items-center gap-2">
-            <span class="text-muted small">{{ current_time }}</span> <!-- You might need to pass this or just omit -->
-
-        </div>
+    <div class="col-md-6">
+        <h4 class="fw-bold text-dark mb-1">Painel Principal</h4>
+        <small class="text-muted">Visão geral do sistema</small>
     </div>
 </div>
 
-<!-- Stats Row (Small Cards) -->
-<div class="row g-4 mb-5">
-    <!-- Ticket Stat -->
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100 rounded-4">
-            <div class="card-body d-flex align-items-center">
-                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
-                    <span class="fs-4">🎫</span>
-                </div>
-                <div>
-                    <h5 class="card-title fw-bold mb-0">{{ chart_data.open }}</h5>
-                    <small class="text-muted">Chamados Abertos</small>
-                </div>
-            </div>
-            <div class="card-footer bg-transparent border-0 rounded-bottom-4">
-                <a href="{{ url_for('tickets.index') }}" class="text-decoration-none small fw-bold">Ver todos →</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Finance Stat -->
-    {% if not current_user.is_porteiro %}
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100 rounded-4">
-            <div class="card-body d-flex align-items-center">
-                <div class="bg-warning bg-opacity-10 p-3 rounded-circle me-3">
-                    <span class="fs-4">💰</span>
-                </div>
-                <div>
-                    {% if current_user.is_admin %}
-                    <h5 class="card-title fw-bold mb-0">{{ payment_stats.pending_count }}</h5>
-                    <small class="text-muted">Pgts Pendentes</small>
-                    {% else %}
-                    <h5 class="card-title fw-bold mb-0">R$ {{ "%.0f"|format(payment_amount) }}</h5>
-                    <small class="text-muted">A Pagar</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="card-footer bg-transparent border-0 rounded-bottom-4">
-                <a href="{{ url_for('payments.index') }}" class="text-decoration-none small fw-bold">Financeiro →</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Visitor Stat (Admin/Porteiro/Sindico) -->
-    {% if visitor_stats %}
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100 rounded-4">
-            <div class="card-body d-flex align-items-center">
-                <div class="bg-info bg-opacity-10 p-3 rounded-circle me-3">
-                    <span class="fs-4">👥</span>
-                </div>
-                <div>
-                    <h5 class="card-title fw-bold mb-0">{{ visitor_stats.active }}</h5>
-                    <small class="text-muted">Visitantes Ativos</small>
-                </div>
-            </div>
-            <div class="card-footer bg-transparent border-0 rounded-bottom-4">
-                <a href="{{ url_for('visitors.index') }}" class="text-decoration-none small fw-bold">Portaria →</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Notices Stat/Recent -->
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100 rounded-4">
-            <div class="card-body d-flex align-items-center">
-                <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3">
-                    <span class="fs-4">📢</span>
-                </div>
-                <div>
-                    <h5 class="card-title fw-bold mb-0">{{ notices|length }}</h5>
-                    <small class="text-muted">Novos Avisos</small>
-                </div>
-            </div>
-            <div class="card-footer bg-transparent border-0 rounded-bottom-4">
-                <a href="{{ url_for('notices.index') }}" class="text-decoration-none small fw-bold">Ler avisos →</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Main Content Area: Charts & Detailed Lists -->
+<!-- Stats Row (Hero Cards) -->
 <div class="row g-4 mb-4">
-    <!-- Left Column: Big Charts -->
+    <!-- Revenue/Finance Card (Like 'Total Revenue') -->
+    {% if not current_user.is_porteiro %}
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 ps-2"> <!-- ps-2 for colored border effect if needed -->
+            <div class="card-body d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Financeiro</small>
+                    <h2 class="fw-bold text-dark mb-0 mt-2">
+                        {% if current_user.is_admin %}
+                        {{ payment_stats.pending_count }} <span class="fs-6 text-muted fw-normal">pendentes</span>
+                        {% else %}
+                        R$ {{ "%.0f"|format(payment_amount) }}
+                        {% endif %}
+                    </h2>
+                    <div class="mt-2 text-success small fw-bold">
+                        <i class="bi bi-arrow-up-short"></i> Regular
+                    </div>
+                </div>
+                <div class="bg-light rounded-circle p-3 text-primary">
+                    <i class="bi bi-wallet2 fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Visitors Card (Like 'Active Visitors') -->
+    {% if visitor_stats %}
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Visitantes</small>
+                    <h2 class="fw-bold text-dark mb-0 mt-2">{{ visitor_stats.active }}</h2>
+                    <div class="mt-2 text-primary small fw-bold">
+                        <i class="bi bi-people"></i> Ativos hoje
+                    </div>
+                </div>
+                <div class="bg-light rounded-circle p-3 text-info">
+                    <i class="bi bi-person-check fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Alerts/Tickets Card (Like 'Alerts') -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Chamados</small>
+                    <h2 class="fw-bold text-dark mb-0 mt-2">{{ chart_data.open }}</h2>
+                    <div class="mt-2 text-danger small fw-bold">
+                        <i class="bi bi-exclamation-circle"></i> Abertos
+                    </div>
+                </div>
+                <div class="bg-light rounded-circle p-3 text-danger">
+                    <i class="bi bi-ticket-perforated fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Grid -->
+<div class="row g-4 mb-4">
+    <!-- Main Chart Column (Like 'Revenue Trend') -->
     <div class="col-lg-8">
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
             <div
                 class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0">Visão Geral</h5>
-                <small class="text-muted">Estatísticas Mensais</small>
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">Fluxo do Condomínio</h5>
+                    <small class="text-muted">Visitas nos últimos 7 dias</small>
+                </div>
+                <!-- Optional Timeframe Toggle -->
+                <div class="bg-light rounded-pill p-1 d-none d-sm-block">
+                    <span class="badge bg-white text-dark shadow-sm rounded-pill px-3 py-2 pointer">Semana</span>
+                </div>
             </div>
             <div class="card-body px-4 pb-4">
-                <!-- Tabs for Charts (Optional, using simple stacking for now) -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <h6 class="text-muted small text-uppercase fw-bold mb-3">Chamados</h6>
-                        <div style="height: 250px;">
-                            <canvas id="ticketsChart"></canvas>
-                        </div>
-                    </div>
-                    {% if not current_user.is_porteiro %}
-                    <div class="col-md-6 mb-3">
-                        <h6 class="text-muted small text-uppercase fw-bold mb-3">Financeiro</h6>
-                        <div style="height: 250px;">
-                            <canvas id="paymentsChart"></canvas>
+                <div style="height: 320px; width: 100%;">
+                    {% if visitor_stats %}
+                    <canvas id="mainTrendChart"></canvas>
+                    {% else %}
+                    <div class="h-100 d-flex align-items-center justify-content-center text-muted col-12">
+                        <div class="text-center">
+                            <i class="bi bi-graph-up fs-1 d-block mb-2 opacity-25"></i>
+                            Dados insuficientes para o gráfico
                         </div>
                     </div>
                     {% endif %}
                 </div>
-
-                {% if visitor_stats %}
-                <hr class="text-muted text-opacity-25 my-4">
-                <div class="row">
-                    <div class="col-12">
-                        <h6 class="text-muted small text-uppercase fw-bold mb-3">Fluxo de Visitantes (7 Dias)</h6>
-                        <div style="height: 250px;">
-                            <canvas id="visitorsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </div>
-
-        {% if not current_user.is_porteiro %}
-        <!-- Action Banner (Like "Rent Received") -->
-        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white overflow-hidden position-relative">
-            <div class="card-body p-5 position-relative z-2">
-                <h3 class="fw-bold mb-2">Precisa de algo?</h3>
-                <p class="mb-4 text-white-50" style="max-width: 400px;">Abra um novo chamado ou verifique seus
-                    pagamentos pendentes com facilidade.</p>
-                <a href="{{ url_for('tickets.create') }}" class="btn btn-light rounded-pill px-4 fw-bold">Novo
-                    Chamado</a>
-            </div>
-            <div class="position-absolute rounded-circle bg-white opacity-10"
-                style="width: 300px; height: 300px; top: -50px; right: -50px;"></div>
-        </div>
-        {% endif %}
     </div>
 
-    <!-- Right Column: Notices/Side Widgets -->
+    <!-- Right Sidebar (Recent Activity/List) -->
     <div class="col-lg-4">
-        <!-- Notices List -->
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div
-                class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0">Comunicados</h5>
-                <a href="{{ url_for('notices.index') }}" class="small text-decoration-none">Ver tudo</a>
+        <!-- Recent Activity List -->
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0 text-dark">Atividade Recente</h5>
             </div>
-            <div class="card-body px-0">
+            <div class="card-body px-0 pt-2">
                 <div class="list-group list-group-flush">
-                    {% for notice in notices %}
-                    <div class="list-group-item border-0 px-4 py-3">
-                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                            <h6 class="mb-0 fw-bold text-dark text-truncate" style="max-width: 180px;">{{ notice.title
-                                }}</h6>
-                            <small class="text-muted text-nowrap ms-2" style="font-size: 0.75rem;">{{
-                                notice.created_at.strftime('%d/%m') }}</small>
+                    {% if notices %}
+                    {% for notice in notices[:4] %}
+                    <div class="list-group-item border-0 px-4 py-3 d-flex align-items-start gap-3 hover-bg-light">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                            style="width: 40px; height: 40px;">
+                            <i class="bi bi-megaphone-fill fs-6"></i>
                         </div>
-                        <p class="mb-1 text-muted small text-truncate" style="max-width: 250px;">Clique para ler os
-                            detalhes deste comunicado.</p>
-                    </div>
-                    {% else %}
-                    <div class="p-4 text-center text-muted">
-                        <small>Sem comunicados recentes.</small>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <h6 class="mb-1 fw-bold text-dark text-truncate">{{ notice.title }}</h6>
+                            <p class="mb-0 small text-muted text-truncate">{{ notice.content }}</p>
+                        </div>
+                        <small class="text-muted fw-bold" style="font-size: 0.7rem;">
+                            {{ notice.created_at.strftime('%d/%m') }}
+                        </small>
                     </div>
                     {% endfor %}
+                    {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <small>Nenhuma atividade recente.</small>
+                    </div>
+                    {% endif %}
+
+                    <!-- Fake 'New Activity' items to fill space if needed (Optional) -->
+                    <!-- Used to match the design density -->
+                </div>
+
+                <div class="px-4 mt-3">
+                    <a href="{{ url_for('notices.index') }}"
+                        class="btn btn-light w-100 text-primary fw-bold py-2 rounded-3">Ver Todos</a>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -196,104 +157,80 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // Chart.js Theme Logic
-    function getChartColor() {
-        return document.documentElement.getAttribute('data-theme') === 'dark' ? '#e0e0e0' : '#666';
-    }
+    document.addEventListener("DOMContentLoaded", function () {
+        {% if visitor_stats %}
+        const ctx = document.getElementById('mainTrendChart').getContext('2d');
 
-    // Capture theme changes (optional, typically requires reload or more complex listener, keeping simple for now)
-    const textColor = getChartColor();
+        // Gradient Fill (Like the reference image)
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(67, 24, 255, 0.4)'); // Top: Strong Blue
+        gradient.addColorStop(1, 'rgba(67, 24, 255, 0.0)'); // Bottom: Transparent
 
-    const commonOptions = {
-        indexAxis: 'y', // Horizontal bars
-        responsive: true,
-        plugins: {
-            legend: { display: false }
-        },
-        maintainAspectRatio: false,
-        scales: {
-            x: {
-                beginAtZero: true,
-                grid: { display: false },
-                ticks: { color: textColor }
-            },
-            y: {
-                grid: { display: false },
-                ticks: { color: textColor }
-            }
-        }
-    };
-
-    const ctxTickets = document.getElementById('ticketsChart').getContext('2d');
-    new Chart(ctxTickets, {
-        type: 'bar',
-        data: {
-            labels: ['Aberto', 'Andamento', 'Concluído'],
-            datasets: [{
-                data: [{{ chart_data.open }}, {{ chart_data.progress }}, {{ chart_data.closed }}],
-        backgroundColor: ['#dc3545', '#ffc107', '#198754'],
-        borderWidth: 1,
-        barPercentage: 0.6
-            }]
-        },
-        options: commonOptions
-    });
-
-    {% if not current_user.is_porteiro %}
-    const ctxPayments = document.getElementById('paymentsChart').getContext('2d');
-    new Chart(ctxPayments, {
-        type: 'bar',
-        data: {
-            labels: ['Pendente', 'Pago'],
-            datasets: [{
-                data: [{{ payment_stats.pending_count }}, {{ payment_stats.paid_count }}],
-        backgroundColor: ['#fd7e14', '#20c997'],
-        borderWidth: 1,
-        barPercentage: 0.6
-    }]
-        },
-        options: commonOptions
-    });
-    {% endif %}
-
-    {% if visitor_stats %}
-    const ctxVisitors = document.getElementById('visitorsChart').getContext('2d');
-    new Chart(ctxVisitors, {
-        type: 'line',
-        data: {
-            labels: {{ visitor_stats.labels | tojson }},
+        const chartConfig = {
+            type: 'line',
+            data: {
+                labels: {{ visitor_stats.labels | tojson
+    }},
         datasets: [{
             label: 'Visitas',
             data: {{ visitor_stats.data | tojson }},
         borderColor: '#4318FF',
-        backgroundColor: 'rgba(67, 24, 255, 0.1)',
-        tension: 0.4,
+        backgroundColor: gradient,
+        borderWidth: 3,
+        tension: 0.4, // Smooth curve
         fill: true,
-        pointRadius: 4,
-        pointBackgroundColor: '#fff',
-        pointBorderColor: '#4318FF',
-        pointBorderWidth: 2
-            }]
-        },
+        pointRadius: 0, // Hiding points for cleaner look (hover shows them)
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: '#4318FF',
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2
+                }]
+            },
         options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#111C44',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                padding: 10,
+                cornerRadius: 8,
+                displayColors: false
+            }
         },
         scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { precision: 0, color: textColor },
-                grid: { color: document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }
-            },
             x: {
                 grid: { display: false },
-                ticks: { color: textColor }
+                ticks: {
+                    color: '#A3AED0',
+                    font: { family: "'DM Sans', sans-serif", size: 12 }
+                }
+            },
+            y: {
+                grid: {
+                    display: true,
+                    borderDash: [5, 5],
+                    color: 'rgba(163, 174, 208, 0.1)'
+                },
+                ticks: {
+                    color: '#A3AED0',
+                    font: { family: "'DM Sans', sans-serif", size: 12 },
+                    maxTicksLimit: 5
+                },
+                border: { display: false } // Remove side line
             }
-        }
+        },
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
     }
-    });
+        };
+
+    new Chart(ctx, chartConfig);
     {% endif %}
+    });
 </script>
 {% endblock %}
