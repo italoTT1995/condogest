@@ -107,6 +107,32 @@
                 </div>
             </div>
         </div>
+
+        <!-- Restore: Status Overview (Visão Geral) -->
+        <div class="row mt-4">
+            <div class="col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h6 class="text-uppercase text-muted fw-bold mb-3 small">Status dos Chamados</h6>
+                        <div style="height: 200px;">
+                            <canvas id="ticketsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if not current_user.is_porteiro %}
+            <div class="col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h6 class="text-uppercase text-muted fw-bold mb-3 small">Status Financeiro</h6>
+                        <div style="height: 200px;">
+                            <canvas id="paymentsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Right Sidebar (Recent Activity/List) -->
