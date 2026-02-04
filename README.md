@@ -5,6 +5,16 @@
 > **Gestão completa, moderna e eficiente para condomíios residenciais.**  
 > O CondoGest centraliza portaria, financeiro, reservas e comunicação em uma única plataforma web/mobile.
 
+<div align="center">
+  <a href="https://condogest-1.onrender.com">
+    <img src="https://img.shields.io/badge/Live_Demo-Ver_Online-2ea44f?style=for-the-badge&logo=google-chrome" alt="Live Demo" />
+  </a>
+  <a href="https://italott1995.github.io/condogest-apresentacao/">
+    <img src="https://img.shields.io/badge/Portfólio-Ver_Apresentação-0d6efd?style=for-the-badge&logo=github" alt="Presentation" />
+  </a>
+</div>
+
+
 ## 🚀 Sobre o Projeto
 
 O **CondoGest** é uma solução *Full-Stack* desenvolvida para modernizar a administração de condomínios. Ele elimina o uso de papel e planilhas desconexas, oferecendo um painel administrativo robusto para síndicos e um aplicativo intuitivo para moradores e porteiros.
