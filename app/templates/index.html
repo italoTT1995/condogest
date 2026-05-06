@@ -19,8 +19,8 @@
                 {% if current_user.profile_image and current_user.profile_image != 'default.jpg' %}
                     <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_image) }}" class="profile-avatar-mobile me-3 shadow" alt="Profile">
                 {% else %}
-                    <div class="profile-avatar-mobile bg-white me-3 shadow d-flex align-items-center justify-content-center text-primary fw-bold fs-2" style="background-image: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);">
-                        {{ current_user.username[0].upper() if current_user.username else 'U' }}
+                    <div class="profile-avatar-mobile bg-white me-3 shadow d-flex align-items-center justify-content-center text-primary" style="background-image: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);">
+                        <i class="bi bi-person-fill" style="font-size: 2.8rem; opacity: 0.8;"></i>
                     </div>
                 {% endif %}
                 <div>
