@@ -19,7 +19,7 @@
                 {% if current_user.profile_image and current_user.profile_image != 'default.jpg' %}
                     <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_image) }}" class="profile-avatar-mobile me-3 shadow" alt="Profile">
                 {% else %}
-                    <div class="profile-avatar-mobile me-3 shadow d-flex align-items-center justify-content-center bg-white text-primary fw-bold fs-3">
+                    <div class="profile-avatar-mobile me-3 shadow d-flex align-items-center justify-content-center bg-white text-primary fw-bold fs-2">
                         {{ current_user.username[0].upper() if current_user.username else 'U' }}
                     </div>
                 {% endif %}
