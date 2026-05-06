@@ -690,11 +690,11 @@ a {
     }
 
     .stats-bar-mobile {
-        background: var(--bg-surface);
+        background: var(--bg-surface) !important;
         border-radius: 28px;
         padding: 20px 15px;
-        margin-top: -80px; /* Floating higher */
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        margin-top: -65px; /* Adjusted to float perfectly */
+        box-shadow: 0 15px 45px rgba(0,0,0,0.1);
         display: flex;
         justify-content: space-around;
         text-align: center;
@@ -702,10 +702,23 @@ a {
         width: 90%;
         margin-left: auto;
         margin-right: auto;
+        position: relative;
+        z-index: 20; /* Ensure it's above the header and content */
+    }
+
+    .stats-item-mobile h5 {
+        color: var(--text-main) !important;
+        font-weight: 800;
+    }
+
+    .stats-item-mobile small {
+        color: var(--text-muted) !important;
     }
 
     .dashboard-container-mobile {
         padding: 0 20px;
+        position: relative;
+        z-index: 10;
     }
 
     /* SOS Button Fixed */
