@@ -57,17 +57,30 @@
     
     /* SOS Type Cards */
     .sos-type-card {
-      border: 2px solid transparent;
-      border-radius: 12px;
-      padding: 20px;
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 20px;
+      padding: 25px 15px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      background: #f8f9fa;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: white;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-    .sos-type-card.police:hover { border-color: #0d6efd; background: #e9ecef; }
-    .sos-type-card.police i { color: #0d6efd; font-size: 2.5rem; }
-    .sos-type-card.porteiro:hover { border-color: #dc3545; background: #e9ecef; }
-    .sos-type-card.porteiro i { color: #dc3545; font-size: 2.5rem; }
+    .sos-type-card:active { transform: scale(0.95); }
+    .sos-icon-circle {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+    .sos-type-card.police:hover { border-color: #0d6efd; box-shadow: 0 10px 20px rgba(13, 110, 253, 0.1) !important; }
+    .sos-type-card.porteiro:hover { border-color: #dc3545; box-shadow: 0 10px 20px rgba(220, 53, 69, 0.1) !important; }
     
     /* Fullscreen Emergency Overlay */
     .emergency-overlay {
@@ -490,11 +503,11 @@
           <div class="modal-body text-center">
             <p class="text-muted mb-4">Escolha o tipo de emergência para prosseguirmos rapidamente.</p>
             
-            <div class="row g-3 px-2">
+            <div class="row g-3 px-1">
               <div class="col-6">
                 <div class="sos-type-card police shadow-sm" onclick="selectSOSType('police')">
-                  <div class="sos-icon-circle bg-primary bg-opacity-10 mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; border-radius: 50%;">
-                    <i class="bi bi-shield-shaded text-primary fs-4"></i>
+                  <div class="sos-icon-circle bg-primary bg-opacity-10 mb-3">
+                    <i class="bi bi-shield-shaded text-primary"></i>
                   </div>
                   <h6 class="fw-bold mb-1 text-dark">Polícia</h6>
                   <small class="text-muted d-block" style="font-size: 0.7rem;">Emergência Grave</small>
@@ -502,8 +515,8 @@
               </div>
               <div class="col-6">
                 <div class="sos-type-card porteiro shadow-sm" onclick="selectSOSType('porteiro')">
-                  <div class="sos-icon-circle bg-danger bg-opacity-10 mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; border-radius: 50%;">
-                    <i class="bi bi-telephone-outbound-fill text-danger fs-4"></i>
+                  <div class="sos-icon-circle bg-danger bg-opacity-10 mb-3">
+                    <i class="bi bi-telephone-outbound-fill text-danger"></i>
                   </div>
                   <h6 class="fw-bold mb-1 text-dark">Portaria</h6>
                   <small class="text-muted d-block" style="font-size: 0.7rem;">Falar com Porteiro</small>
