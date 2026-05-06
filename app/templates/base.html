@@ -111,6 +111,46 @@
 
 <body>
   {% if current_user.is_authenticated %}
+  <!-- Premium Mobile Navigation Shell (App Mode) -->
+  <div class="d-md-none">
+    <div class="mobile-top-bar">
+      <div class="fw-bold fs-5">CondoGest</div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" onclick="openSOSModal(); return false;" class="text-white text-decoration-none">
+          <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="text-white text-decoration-none">
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="mobile-bottom-nav">
+      <a href="{{ url_for('main.index') }}" class="mobile-nav-item {{ 'active' if request.endpoint == 'main.index' else '' }}">
+        <i class="bi bi-house-door-fill"></i>
+        <span>Início</span>
+      </a>
+      <a href="{{ url_for('tickets.index') }}" class="mobile-nav-item {{ 'active' if 'tickets' in (request.endpoint or '') else '' }}">
+        <i class="bi bi-chat-left-text-fill"></i>
+        <span>Chamados</span>
+      </a>
+      <a href="{{ url_for('access.my_badge') }}" class="mobile-nav-item {{ 'active' if 'access' in (request.endpoint or '') else '' }}">
+        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 50px; height: 50px; margin-top: -35px; border: 5px solid var(--bg-surface);">
+          <i class="bi bi-qr-code m-0"></i>
+        </div>
+        <span class="mt-1">Acesso</span>
+      </a>
+      <a href="{{ url_for('notices.index') }}" class="mobile-nav-item {{ 'active' if 'notices' in (request.endpoint or '') else '' }}">
+        <i class="bi bi-megaphone-fill"></i>
+        <span>Avisos</span>
+      </a>
+      <a href="{{ url_for('auth.profile') }}" class="mobile-nav-item {{ 'active' if 'auth.profile' == request.endpoint else '' }}">
+        <i class="bi bi-person-fill"></i>
+        <span>Perfil</span>
+      </a>
+    </div>
+  </div>
+
   <div id="wrapper">
     <!-- Sidebar -->
     <nav id="sidebar">
