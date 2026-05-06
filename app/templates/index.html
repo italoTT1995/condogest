@@ -31,6 +31,134 @@
 </div>
 {% endif %}
 
+<!-- Mobile Quick Services Grid (Serviços Rápidos) -->
+<div class="mb-5 d-md-none">
+    <h6 class="fw-bold text-dark mb-3 ps-1">Serviços Rápidos</h6>
+    <div class="row g-3">
+        {% if current_user.role and current_user.role.name == 'SINDICO' %}
+            <!-- SÍNDICO -->
+            <div class="col-4 text-center">
+                <a href="{{ url_for('admin.users_list') }}" class="text-decoration-none text-dark">
+                    <div class="bg-primary bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-people-fill text-primary fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Moradores</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('financial.index') }}" class="text-decoration-none text-dark">
+                    <div class="bg-success bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-currency-dollar text-success fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Financeiro</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('tickets.index') }}" class="text-decoration-none text-dark">
+                    <div class="bg-danger bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-ticket-detailed-fill text-danger fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Chamados</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('reservations.index') }}" class="text-decoration-none text-dark">
+                    <div class="bg-warning bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-calendar-check-fill text-warning fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Reservas</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('notices.index') }}" class="text-decoration-none text-dark">
+                    <div class="bg-info bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-megaphone-fill text-info fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Avisos</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('access.my_badge') }}" class="text-decoration-none text-dark">
+                    <div class="bg-dark bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-qr-code-scan text-dark fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Meu QR</small>
+                </a>
+            </div>
+
+        {% elif current_user.role and current_user.role.name == 'PORTEIRO' %}
+            <!-- PORTEIRO -->
+            <div class="col-4 text-center">
+                <a href="{{ url_for('access.scanner') }}" class="text-decoration-none text-dark">
+                    <div class="bg-success bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-qr-code-scan text-success fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Leitor QR</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('visitors.index') }}" class="text-decoration-none text-dark">
+                    <div class="bg-primary bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-person-badge-fill text-primary fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Portaria</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('deliveries.index') }}" class="text-decoration-none text-dark">
+                    <div class="bg-warning bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-box-seam-fill text-warning fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Encomendas</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('vehicles.index') }}" class="text-decoration-none text-dark">
+                    <div class="bg-info bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-car-front-fill text-info fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Veículos</small>
+                </a>
+            </div>
+
+        {% else %}
+            <!-- MORADOR -->
+            <div class="col-4 text-center">
+                <a href="{{ url_for('access.my_badge') }}" class="text-decoration-none text-dark">
+                    <div class="bg-primary bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-qr-code text-primary fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Meu QR</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('tickets.index') }}" class="text-decoration-none text-dark">
+                    <div class="bg-danger bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-ticket-fill text-danger fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Chamados</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('deliveries.my_deliveries') }}" class="text-decoration-none text-dark">
+                    <div class="bg-warning bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-box-fill text-warning fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Encomendas</small>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ url_for('reservations.index') }}" class="text-decoration-none text-dark">
+                    <div class="bg-success bg-opacity-10 rounded-4 p-3 mb-2 d-flex justify-content-center align-items-center mx-auto shadow-sm transition-hover" style="width: 65px; height: 65px;">
+                        <i class="bi bi-calendar-check text-success fs-3"></i>
+                    </div>
+                    <small class="fw-bold" style="font-size: 0.75rem;">Reservas</small>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
 <!-- Stats Row (Hero Cards) -->
 <div class="row g-4 mb-4">
     <!-- Revenue/Finance Card (Like 'Total Revenue') -->
