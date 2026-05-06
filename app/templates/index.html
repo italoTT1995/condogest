@@ -52,19 +52,19 @@
     <!-- Common Areas Carousel -->
     <h6 class="shots-title">Áreas Comuns</h6>
     <div class="common-areas-carousel">
-        <a href="{{ url_for('reservations.index') }}" class="area-card-mobile">
+        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile">
             <i class="bi bi-water area-icon-mobile"></i>
             <small class="fw-bold">Piscina</small>
         </a>
-        <a href="{{ url_for('reservations.index') }}" class="area-card-mobile">
+        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile">
             <i class="bi bi-person-walking area-icon-mobile" style="color: #FF5722;"></i>
             <small class="fw-bold">Academia</small>
         </a>
-        <a href="{{ url_for('reservations.index') }}" class="area-card-mobile">
+        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile">
             <i class="bi bi-fire area-icon-mobile" style="color: #E91E63;"></i>
             <small class="fw-bold">Churrasqueira</small>
         </a>
-        <a href="{{ url_for('reservations.index') }}" class="area-card-mobile">
+        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile">
             <i class="bi bi-controller area-icon-mobile" style="color: #4CAF50;"></i>
             <small class="fw-bold">Jogos</small>
         </a>
@@ -96,13 +96,13 @@
     <div class="shots-grid">
         {% if current_user.role and current_user.role.name == 'SINDICO' %}
             <!-- SÍNDICO MANAGEMENT SHOTS -->
-            <a href="{{ url_for('admin.users_list') }}" class="shot-card">
+            <a href="{{ url_for('admin.dashboard') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #4318FF; background: rgba(67, 24, 255, 0.1);">
                     <i class="bi bi-people-fill"></i>
                 </div>
                 <small>Moradores</small>
             </a>
-            <a href="{{ url_for('financial.index') }}" class="shot-card">
+            <a href="{{ url_for('financial.transparency') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #2ECC71; background: rgba(46, 204, 113, 0.1);">
                     <i class="bi bi-wallet2"></i>
                 </div>
@@ -114,7 +114,7 @@
                 </div>
                 <small>Chamados</small>
             </a>
-            <a href="{{ url_for('reservations.index') }}" class="shot-card">
+            <a href="{{ url_for('reservations.my_reservations') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #F1C40F; background: rgba(241, 196, 15, 0.1);">
                     <i class="bi bi-calendar-event"></i>
                 </div>
@@ -134,7 +134,7 @@
             </a>
         {% elif current_user.role and current_user.role.name == 'PORTEIRO' %}
             <!-- PORTEIRO WORK SHOTS -->
-            <a href="{{ url_for('access.scanner') }}" class="shot-card">
+            <a href="{{ url_for('access.scan') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #2ECC71; background: rgba(46, 204, 113, 0.1);">
                     <i class="bi bi-qr-code-scan"></i>
                 </div>
@@ -178,7 +178,7 @@
                 </div>
                 <small>Encomendas</small>
             </a>
-            <a href="{{ url_for('reservations.index') }}" class="shot-card">
+            <a href="{{ url_for('reservations.my_reservations') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #2ECC71; background: rgba(46, 204, 113, 0.1);">
                     <i class="bi bi-calendar-check"></i>
                 </div>
