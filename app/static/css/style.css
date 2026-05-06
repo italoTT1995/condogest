@@ -749,12 +749,13 @@ a {
         z-index: 10;
     }
 
-    /* SOS Button Fixed */
+    /* SOS Button Fixed - Moved above the Bottom Nav Bar */
     .sos-float-btn {
-        bottom: 30px !important;
+        bottom: 100px !important; /* Above the 75px bottom nav bar */
         right: 25px !important;
         width: 65px !important;
         height: 65px !important;
         box-shadow: 0 8px 25px rgba(220, 53, 69, 0.6) !important;
+        z-index: 1100 !important; /* Ensure it stays above everything */
     }
 }
