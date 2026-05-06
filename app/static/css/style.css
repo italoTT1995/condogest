@@ -674,9 +674,19 @@ a {
 
     .profile-header-gradient h5, 
     .profile-header-gradient small,
-    .profile-header-gradient .fw-bold,
     .profile-header-gradient h6 {
         color: white !important;
+    }
+
+    /* Keep the 'Editar' button text dark for visibility */
+    .profile-header-gradient .btn-light {
+        color: var(--primary-color) !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    /* Ensure avatar fallback text is visible */
+    .profile-avatar-mobile.bg-white {
+        color: var(--primary-color) !important;
     }
 
     .profile-avatar-mobile {
