@@ -46,6 +46,7 @@ def create_app(config_class=Config):
     from app.models.lost_found import LostItem
     from app.models.visitor import VisitLog
     from app.models.condominium import Condominium
+    from app.models.notification import Notification
     
     with app.app_context():
         # Ensure all tables exist (fix for missing PushSubscription table on prod)
