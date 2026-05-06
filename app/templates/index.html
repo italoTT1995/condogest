@@ -49,58 +49,15 @@
         </div>
     </div>
 
-    {% if not current_user.is_porteiro %}
-    <!-- Common Areas Carousel -->
-    <h6 class="shots-title">Áreas Comuns</h6>
-    <div class="common-areas-carousel">
-        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=400&q=80'); background-size: cover; background-position: center; border: none; color: white;">
-            <i class="bi bi-water area-icon-mobile text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
-            <small class="fw-bold">Piscina</small>
-        </a>
-        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80'); background-size: cover; background-position: center; border: none; color: white;">
-            <i class="bi bi-person-walking area-icon-mobile text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
-            <small class="fw-bold">Academia</small>
-        </a>
-        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80'); background-size: cover; background-position: center; border: none; color: white;">
-            <i class="bi bi-fire area-icon-mobile text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
-            <small class="fw-bold">Churrasqueira</small>
-        </a>
-        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&q=80'); background-size: cover; background-position: center; border: none; color: white;">
-            <i class="bi bi-controller area-icon-mobile text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
-            <small class="fw-bold">Jogos</small>
-        </a>
-    </div>
-
-    <!-- Quick Entry QR -->
-    <div class="mb-4">
-        <a href="{{ url_for('access.my_badge') }}" class="text-decoration-none">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #4318FF 0%, #2B00D4 100%);">
-                <div class="card-body p-3 d-flex align-items-center justify-content-between text-white">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 45px; height: 45px;">
-                            <i class="bi bi-qr-code fs-4"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-0">Entrada Expressa</h6>
-                            <small class="opacity-75">Acesso rápido via QR Code</small>
-                        </div>
-                    </div>
-                    <i class="bi bi-chevron-right fs-5"></i>
-                </div>
-            </div>
-        </a>
-    </div>
-    {% endif %}
-
     <!-- Quick Services Grid -->
     <h5 class="shots-title mb-4 fw-bold">Serviços Rápidos</h5>
-    <div class="shots-grid mb-4">
+    <div class="shots-grid mb-4" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
         {% if current_user.is_admin %}
             <a href="{{ url_for('admin.dashboard') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #4318FF; background: rgba(67, 24, 255, 0.1);">
                     <i class="bi bi-people-fill"></i>
                 </div>
-                <small>Moradores</small>
+                <small>Pessoas</small>
             </a>
             <a href="{{ url_for('financial.transparency') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #2ECC71; background: rgba(46, 204, 113, 0.1);">
@@ -137,7 +94,7 @@
                 <div class="shot-icon-wrapper" style="color: #F1C40F; background: rgba(241, 196, 15, 0.1);">
                     <i class="bi bi-box-seam"></i>
                 </div>
-                <small>Encomendas</small>
+                <small>Entregas</small>
             </a>
             <a href="{{ url_for('vehicles.index') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #3498DB; background: rgba(52, 152, 219, 0.1);">
@@ -162,7 +119,7 @@
                 <div class="shot-icon-wrapper" style="color: #F1C40F; background: rgba(241, 196, 15, 0.1);">
                     <i class="bi bi-box"></i>
                 </div>
-                <small>Encomendas</small>
+                <small>Entregas</small>
             </a>
             <a href="{{ url_for('reservations.my_reservations') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #2ECC71; background: rgba(46, 204, 113, 0.1);">
@@ -173,12 +130,75 @@
         {% endif %}
     </div>
 
+    <!-- Quick Entry QR -->
+    <div class="mb-4">
+        <a href="{{ url_for('access.my_badge') }}" class="text-decoration-none">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #4318FF 0%, #2B00D4 100%);">
+                <div class="card-body p-3 d-flex align-items-center justify-content-between text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 45px; height: 45px;">
+                            <i class="bi bi-qr-code fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Entrada Expressa</h6>
+                            <small class="opacity-75">Acesso rápido via QR Code</small>
+                        </div>
+                    </div>
+                    <i class="bi bi-chevron-right fs-5"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    {% if not current_user.is_porteiro %}
+    <!-- Common Areas Carousel -->
+    <h6 class="shots-title mb-3">Áreas Comuns</h6>
+    <div class="common-areas-carousel mb-4">
+        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=400&q=80'); background-size: cover; background-position: center; border: none; color: white;">
+            <i class="bi bi-water area-icon-mobile text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
+            <small class="fw-bold">Piscina</small>
+        </a>
+        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80'); background-size: cover; background-position: center; border: none; color: white;">
+            <i class="bi bi-person-walking area-icon-mobile text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
+            <small class="fw-bold">Academia</small>
+        </a>
+        <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80'); background-size: cover; background-position: center; border: none; color: white;">
+            <i class="bi bi-fire area-icon-mobile text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
+            <small class="fw-bold">Churrasqueira</small>
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Recent Notices Mobile -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="shots-title mb-0">Atividade Recente</h6>
+        <a href="{{ url_for('notices.index') }}" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none">Ver Tudo</a>
+    </div>
+    <div class="list-group list-group-flush rounded-4 overflow-hidden shadow-sm mb-5">
+        {% if recent_notices %}
+        {% for notice in recent_notices[:3] %}
+        <div class="list-group-item border-0 px-3 py-3 d-flex align-items-center gap-3 bg-white">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                <i class="bi bi-megaphone-fill"></i>
+            </div>
+            <div class="flex-grow-1 overflow-hidden">
+                <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.9rem;">{{ notice.title }}</h6>
+                <small class="text-muted text-truncate d-block">{{ notice.content }}</small>
+            </div>
+            <small class="text-muted" style="font-size: 0.7rem;">{{ notice.created_at.strftime('%d/%m') }}</small>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="list-group-item border-0 p-4 text-center text-muted bg-white">
+            <small>Nenhum aviso recente.</small>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endif %}
 
-<!-- Stats Row (Hero Cards) -->
-<div class="row g-4 mb-4">
+<!-- Stats Row (Hero Cards) - Desktop Only -->
+<div class="row g-4 mb-4 d-none d-md-flex">
     <!-- Revenue/Finance Card (Like 'Total Revenue') -->
     {% if not current_user.is_porteiro %}
     <div class="col-md-4">
@@ -244,8 +264,8 @@
     </div>
 </div>
 
-<!-- Main Content Grid -->
-<div class="row g-4 mb-4">
+<!-- Main Content Grid - Desktop Only -->
+<div class="row g-4 mb-4 d-none d-md-flex">
     <!-- Main Chart Column (Like 'Revenue Trend') -->
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm h-100">
