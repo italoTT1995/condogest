@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: condogest-web
+    env: python
+    region: ohio
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 2 -b 0.0.0.0:$PORT "app:create_app()"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: condogest-db
+          property: connectionString
+      # Credenciais do nosso Seed Service (Padrão)
+      - key: ADMIN_EMAIL
+        value: admin@system.com
+      - key: ADMIN_PASSWORD
+        value: admin123
+      - key: SINDICO_EMAIL
+        value: sindico@system.com
+      - key: SINDICO_PASSWORD
+        value: sindico123
+      - key: PORTEIRO_EMAIL
+        value: porteiro@system.com
+      - key: PORTEIRO_PASSWORD
+        value: porteiro123
+      - key: MORADOR_EMAIL
+        value: morador@system.com
+      - key: MORADOR_PASSWORD
+        value: morador123
+
+databases:
+  - name: condogest-db
+    databaseName: condogest
+    user: condogest_user
+    plan: free
+    region: ohio
