@@ -26,12 +26,12 @@ if __name__ == "__main__":
     port = 8080
     
     print("="*50)
-    print(f"🚀 CONDO MANAGER - SERVIDOR DE PRODUÇÃO INICIADO")
+    print(f"CONDO MANAGER - SERVIDOR DE PRODUCAO INICIADO")
     print("="*50)
-    print(f"📂 Pasta do Projeto: {os.getcwd()}")
+    print(f"Pasta do Projeto: {os.getcwd()}")
     print("-" * 50)
-    print(f"🌍 Acesso Interno: http://localhost:{port}")
-    print(f"🌍 Acesso Externo: http://{host_ip}:{port}")
+    print(f"Acesso Interno: http://localhost:{port}")
+    print(f"Acesso Externo: http://{host_ip}:{port}")
     print("-" * 50)
     print("Para parar o servidor, feche esta janela.")
     print("="*50)
