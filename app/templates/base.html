@@ -490,17 +490,23 @@
           <div class="modal-body text-center">
             <p class="text-muted mb-4">Escolha o tipo de emergência para prosseguirmos rapidamente.</p>
             
-            <div class="row g-3">
+            <div class="row g-3 px-2">
               <div class="col-6">
-                <div class="sos-type-card police" onclick="selectSOSType('police')">
-                  <i class="bi bi-shield-shaded mb-2"></i>
-                  <h6 class="fw-bold mb-0">Polícia /<br>Bombeiros</h6>
+                <div class="sos-type-card police shadow-sm" onclick="selectSOSType('police')">
+                  <div class="sos-icon-circle bg-primary bg-opacity-10 mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; border-radius: 50%;">
+                    <i class="bi bi-shield-shaded text-primary fs-4"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1 text-dark">Polícia</h6>
+                  <small class="text-muted d-block" style="font-size: 0.7rem;">Emergência Grave</small>
                 </div>
               </div>
               <div class="col-6">
-                <div class="sos-type-card porteiro" onclick="selectSOSType('porteiro')">
-                  <i class="bi bi-bell-fill mb-2"></i>
-                  <h6 class="fw-bold mb-0">Chamar<br>Portaria</h6>
+                <div class="sos-type-card porteiro shadow-sm" onclick="selectSOSType('porteiro')">
+                  <div class="sos-icon-circle bg-danger bg-opacity-10 mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; border-radius: 50%;">
+                    <i class="bi bi-telephone-outbound-fill text-danger fs-4"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1 text-dark">Portaria</h6>
+                  <small class="text-muted d-block" style="font-size: 0.7rem;">Falar com Porteiro</small>
                 </div>
               </div>
             </div>
