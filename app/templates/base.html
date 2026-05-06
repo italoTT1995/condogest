@@ -125,7 +125,7 @@
   </style>
 </head>
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
   {% if current_user.is_authenticated %}
   <!-- Premium Mobile Bottom Nav -->
   <div class="d-md-none mobile-bottom-nav">
@@ -483,7 +483,8 @@
 
         {% block content %}{% endblock %}
 
-        <!-- Global Quick Services (Mobile Only) -->
+        <!-- Global Quick Services (Mobile Only - Subpages) -->
+        {% if request.endpoint != 'main.index' %}
         <div class="d-md-none px-3 pb-5 mb-5 mt-4">
             <h5 class="shots-title mb-4 fw-bold">Serviços Rápidos</h5>
             <div class="shots-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
@@ -565,6 +566,7 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
       </div>
     </div>
   </div>

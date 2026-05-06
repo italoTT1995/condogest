@@ -587,19 +587,24 @@ a {
     }
 
 @media (max-width: 768px) {
-    /* Premium Mobile Shell - Transparent Navbar with hidden hamburger */
+    /* Premium Mobile Shell - Transparent Navbar only on Dashboard */
     .navbar {
+        position: relative !important; /* Default for subpages */
+        background: var(--bg-surface) !important;
+        z-index: 1060;
+        margin: 0 !important;
+        padding-top: 10px !important;
+        display: flex !important;
+    }
+
+    /* Only make it absolute/transparent on index page */
+    .index-page .navbar {
         position: absolute !important;
         top: 0;
         left: 0;
         right: 0;
         background: transparent !important;
-        border: none !important;
         box-shadow: none !important;
-        z-index: 1060;
-        margin: 0 !important;
-        padding-top: 15px !important;
-        display: flex !important;
     }
 
     #sidebarCollapse {
@@ -607,10 +612,11 @@ a {
     }
 
     .navbar .bi, .navbar .nav-link {
+        color: var(--text-main) !important;
+    }
+
+    .index-page .navbar .bi, .index-page .navbar .nav-link {
         color: white !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
         text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
