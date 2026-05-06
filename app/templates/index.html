@@ -16,15 +16,15 @@
     <div class="profile-header-gradient">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div class="d-flex align-items-center">
-                {% if current_user.profile_image %}
-                    <img src="{{ current_user.profile_image }}" class="profile-avatar-mobile me-3 shadow" alt="Profile">
+                {% if current_user.profile_image and current_user.profile_image != 'default.jpg' %}
+                    <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_image) }}" class="profile-avatar-mobile me-3 shadow" alt="Profile">
                 {% else %}
                     <div class="profile-avatar-mobile me-3 shadow d-flex align-items-center justify-content-center bg-white text-primary fw-bold fs-3">
-                        {{ current_user.name[0] if current_user.name else 'U' }}
+                        {{ current_user.username[0].upper() if current_user.username else 'U' }}
                     </div>
                 {% endif %}
                 <div>
-                    <h5 class="mb-0 fw-bold">Olá, {{ current_user.name.split()[0] if current_user.name else 'Usuário' }}</h5>
+                    <h5 class="mb-0 fw-bold">Olá, {{ current_user.username if current_user.username else 'Usuário' }}</h5>
                     <small class="opacity-75">Apartamento {{ current_user.apartment or 'N/A' }}</small>
                 </div>
             </div>
@@ -39,11 +39,11 @@
             <small>Avisos</small>
         </div>
         <div class="stats-item-mobile">
-            <h5>{{ chart_data.open if chart_data else 0 }}</h5>
+            <h5>{{ chart_data.get('open', 0) if chart_data else 0 }}</h5>
             <small>Chamados</small>
         </div>
         <div class="stats-item-mobile">
-            <h5>{{ visitor_stats.active if visitor_stats else 0 }}</h5>
+            <h5>{{ visitor_stats.get('active', 0) if visitor_stats else 0 }}</h5>
             <small>Acessos</small>
         </div>
     </div>
@@ -224,7 +224,7 @@
             <div class="card-body d-flex align-items-center">
                 <div class="flex-grow-1">
                     <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Visitantes</small>
-                    <h2 class="fw-bold text-dark mb-0 mt-2">{{ visitor_stats.active }}</h2>
+                    <h2 class="fw-bold text-dark mb-0 mt-2">{{ visitor_stats.get('active', 0) }}</h2>
                     <div class="mt-2 text-primary small fw-bold">
                         <i class="bi bi-people"></i> Ativos hoje
                     </div>
@@ -243,7 +243,7 @@
             <div class="card-body d-flex align-items-center">
                 <div class="flex-grow-1">
                     <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Chamados</small>
-                    <h2 class="fw-bold text-dark mb-0 mt-2">{{ chart_data.open }}</h2>
+                    <h2 class="fw-bold text-dark mb-0 mt-2">{{ chart_data.get('open', 0) }}</h2>
                     <div class="mt-2 text-danger small fw-bold">
                         <i class="bi bi-exclamation-circle"></i> Abertos
                     </div>
@@ -375,11 +375,10 @@
         const chartConfig = {
             type: 'line',
             data: {
-                labels: {{ visitor_stats.labels | tojson
-    }},
-        datasets: [{
-            label: 'Visitas',
-            data: {{ visitor_stats.data | tojson }},
+                labels: {{ visitor_stats.get('labels', []) | tojson }},
+                datasets: [{
+                    label: 'Visitantes',
+                    data: {{ visitor_stats.get('data', []) | tojson }},
         borderColor: '#4318FF',
         backgroundColor: gradient,
         borderWidth: 3,
@@ -465,7 +464,7 @@
         data: {
             labels: ['Aberto', 'Andamento', 'Concluído'],
             datasets: [{
-                data: [{{ chart_data.open }}, {{ chart_data.progress }}, {{ chart_data.closed }}],
+                data: [{{ chart_data.get('open', 0) }}, {{ chart_data.get('progress', 0) }}, {{ chart_data.get('closed', 0) }}],
         backgroundColor: ['#E31A1A', '#FFB547', '#05CD99'],
         barPercentage: 0.5
             }]
