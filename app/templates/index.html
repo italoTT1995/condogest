@@ -34,7 +34,7 @@
     </div>
 
     <!-- Stats Bar Mobile -->
-    <div class="stats-bar-mobile">
+    <div class="stats-bar-mobile fade-in-up" style="animation-delay: 0.1s;">
         <div class="stats-item-mobile">
             <h5>{{ recent_notices|length if recent_notices else 0 }}</h5>
             <small>Avisos</small>
@@ -50,8 +50,8 @@
     </div>
 
     <!-- Quick Services Grid -->
-    <h5 class="shots-title mb-4 fw-bold">Serviços Rápidos</h5>
-    <div class="shots-grid mb-4" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+    <h5 class="shots-title mb-4 fw-bold fade-in-up" style="animation-delay: 0.2s;">Serviços Rápidos</h5>
+    <div class="shots-grid mb-4 fade-in-up" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; animation-delay: 0.2s;">
         {% if current_user.is_admin %}
             <a href="{{ url_for('admin.dashboard') }}" class="shot-card">
                 <div class="shot-icon-wrapper" style="color: #4318FF; background: rgba(67, 24, 255, 0.1);">
@@ -131,7 +131,7 @@
     </div>
 
     <!-- Quick Entry QR -->
-    <div class="mb-4">
+    <div class="mb-4 fade-in-up" style="animation-delay: 0.3s;">
         <a href="{{ url_for('access.my_badge') }}" class="text-decoration-none">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #4318FF 0%, #2B00D4 100%);">
                 <div class="card-body p-3 d-flex align-items-center justify-content-between text-white">
@@ -152,8 +152,8 @@
 
     {% if not current_user.is_porteiro %}
     <!-- Common Areas Carousel -->
-    <h6 class="shots-title mb-3">Áreas Comuns</h6>
-    <div class="common-areas-carousel mb-4">
+    <h6 class="shots-title mb-3 fade-in-up" style="animation-delay: 0.4s;">Áreas Comuns</h6>
+    <div class="common-areas-carousel mb-4 fade-in-up" style="animation-delay: 0.4s;">
         <a href="{{ url_for('reservations.my_reservations') }}" class="area-card-mobile" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=400&q=80'); background-size: cover; background-position: center; border: none; color: white;">
             <i class="bi bi-water area-icon-mobile text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
             <small class="fw-bold">Piscina</small>
@@ -170,11 +170,11 @@
     {% endif %}
 
     <!-- Recent Notices Mobile -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3 fade-in-up" style="animation-delay: 0.5s;">
         <h6 class="shots-title mb-0">Atividade Recente</h6>
         <a href="{{ url_for('notices.index') }}" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none">Ver Tudo</a>
     </div>
-    <div class="list-group list-group-flush rounded-4 overflow-hidden shadow-sm mb-5">
+    <div class="list-group list-group-flush rounded-4 overflow-hidden shadow-sm mb-5 fade-in-up" style="animation-delay: 0.5s;">
         {% if recent_notices %}
         {% for notice in recent_notices[:3] %}
         <div class="list-group-item border-0 px-3 py-3 d-flex align-items-center gap-3 bg-white">
