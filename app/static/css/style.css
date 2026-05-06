@@ -587,8 +587,35 @@ a {
     }
 
     /* --- Premium Mobile Shell --- */
-    /* Premium Mobile Shell - Hide Top Navbar completely */
+    /* Premium Mobile Shell - Transparent Navbar with hidden hamburger */
     .navbar {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        z-index: 1060;
+        margin: 0 !important;
+        padding-top: 15px !important;
+        display: flex !important; /* Restore display */
+    }
+
+    #sidebarCollapse {
+        display: none !important; /* Hide ONLY the 3 bars */
+    }
+
+    .navbar .bi, .navbar .nav-link {
+        color: white !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* Hide the 'Transparência' text on mobile to save space */
+    .navbar .nav-link span {
         display: none !important;
     }
 
@@ -656,7 +683,7 @@ a {
     .profile-header-gradient {
         background: linear-gradient(135deg, #4318FF 0%, #2B00D4 100%);
         border-radius: 0 0 50px 50px;
-        padding: 50px 25px 120px 25px !important; /* Reduced top padding as navbar is gone */
+        padding: 100px 25px 120px 25px !important; /* Restored top padding for icons */
         margin: 0 !important; 
         color: white !important;
         box-shadow: 0 15px 35px rgba(67, 24, 255, 0.2);
