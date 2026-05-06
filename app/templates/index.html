@@ -202,6 +202,7 @@
         {% endif %}
     </div>
 
+    {% if current_user.is_admin or current_user.is_porteiro %}
     <!-- Quick Entry QR -->
     <div class="mb-4 fade-in-up" style="animation-delay: 0.3s;">
         <a href="{{ url_for('access.my_badge') }}" class="text-decoration-none">
@@ -221,6 +222,23 @@
             </div>
         </a>
     </div>
+
+    <!-- Condominium Flow Chart Mobile -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 fade-in-up" style="animation-delay: 0.6s;">
+        <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">Fluxo do Condomínio</h6>
+            <div style="height: 180px; width: 100%;">
+                {% if visitor_stats %}
+                <canvas id="mainTrendChartMobile"></canvas>
+                {% else %}
+                <div class="h-100 d-flex align-items-center justify-content-center text-muted">
+                    <small>Dados insuficientes</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     {% if not current_user.is_porteiro %}
     <!-- Common Areas Carousel -->
@@ -265,22 +283,6 @@
             <small>Nenhum aviso recente.</small>
         </div>
         {% endif %}
-    </div>
-
-    <!-- Condominium Flow Chart Mobile -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4 fade-in-up" style="animation-delay: 0.6s;">
-        <div class="card-body p-4">
-            <h6 class="fw-bold mb-3">Fluxo do Condomínio</h6>
-            <div style="height: 180px; width: 100%;">
-                {% if visitor_stats %}
-                <canvas id="mainTrendChartMobile"></canvas>
-                {% else %}
-                <div class="h-100 d-flex align-items-center justify-content-center text-muted">
-                    <small>Dados insuficientes</small>
-                </div>
-                {% endif %}
-            </div>
-        </div>
     </div>
 
     <!-- Financial Summary Mobile -->
