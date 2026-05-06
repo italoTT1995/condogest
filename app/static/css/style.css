@@ -586,7 +586,7 @@ a {
         line-height: 1.2;
     }
 
-    /* --- Premium Mobile Shell --- */
+@media (max-width: 768px) {
     /* Premium Mobile Shell - Transparent Navbar with hidden hamburger */
     .navbar {
         position: absolute !important;
@@ -599,7 +599,7 @@ a {
         z-index: 1060;
         margin: 0 !important;
         padding-top: 15px !important;
-        display: flex !important; /* Restore display */
+        display: flex !important;
     }
 
     #sidebarCollapse {

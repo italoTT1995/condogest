@@ -57,30 +57,33 @@
     
     /* SOS Type Cards */
     .sos-type-card {
-      border: 1px solid rgba(0,0,0,0.05);
+      border: 2px solid #f1f1f1;
       border-radius: 20px;
-      padding: 25px 15px;
+      padding: 30px 15px;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      background: white;
+      background: #fdfdfd;
       height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
     }
-    .sos-type-card:active { transform: scale(0.95); }
+    .sos-type-card:active { transform: scale(0.95); background: #f0f0f0; }
     .sos-icon-circle {
-      width: 65px;
-      height: 65px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.8rem;
+      font-size: 2.2rem;
+      margin-bottom: 15px;
     }
-    .sos-type-card.police:hover { border-color: #0d6efd; box-shadow: 0 10px 20px rgba(13, 110, 253, 0.1) !important; }
-    .sos-type-card.porteiro:hover { border-color: #dc3545; box-shadow: 0 10px 20px rgba(220, 53, 69, 0.1) !important; }
+    .sos-type-card h6 { font-size: 1.1rem; color: #2B3674 !important; margin-bottom: 5px; }
+    .sos-type-card small { font-size: 0.8rem; color: #A3AED0 !important; }
+    .sos-type-card.police:hover { border-color: #0d6efd; box-shadow: 0 10px 25px rgba(13, 110, 253, 0.15) !important; }
+    .sos-type-card.porteiro:hover { border-color: #dc3545; box-shadow: 0 10px 25px rgba(220, 53, 69, 0.15) !important; }
     
     /* Fullscreen Emergency Overlay */
     .emergency-overlay {
