@@ -649,26 +649,24 @@ a {
         text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
-    /* Override layouts for Premium App Feel */
-    #sidebar {
-        display: none !important;
-    }
-
-    .navbar {
-        display: none !important;
+    /* Premium Mobile Shell - Cleaned up to avoid breaking global layout */
+    .mobile-bottom-nav {
+        display: none; /* Disabling for now as it conflicts with standard navigation */
     }
 
     #content {
-        padding: 0 !important;
+        padding: 15px !important;
         margin-top: 0 !important;
-        margin-bottom: 80px !important;
+        width: 100%;
     }
 
     .profile-header-gradient {
-        padding-top: 70px !important; /* Space for top bar */
+        padding-top: 20px !important; 
+        margin-left: -15px;
+        margin-right: -15px;
     }
 
     .dashboard-container-mobile {
-        padding: 0 20px;
+        padding: 0;
     }
 }
