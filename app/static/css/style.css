@@ -455,11 +455,12 @@ a {
 /* --- Mobile Dashboard Styles (Restored) --- */
 @media (max-width: 768px) {
     .profile-header-gradient {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        background: linear-gradient(135deg, #4318FF 0%, #2B00D4 100%);
         border-radius: 0 0 40px 40px;
-        padding: 40px 20px 80px 20px;
-        margin: -30px -30px 20px -30px;
+        padding: 50px 25px 90px 25px;
+        margin: -15px -15px 20px -15px; /* Alignment fix for restored shell */
         color: white;
+        box-shadow: 0 10px 30px rgba(67, 24, 255, 0.15);
     }
 
     .profile-avatar-mobile {
@@ -629,44 +630,24 @@ a {
         transform: scale(0.85);
     }
 
-    .mobile-top-bar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 70px;
-        background: transparent;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 20px;
-        z-index: 1040;
-        color: white;
-    }
-
-    .mobile-top-bar i {
-        font-size: 1.4rem;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    /* Premium Mobile Shell - Cleaned up to avoid breaking global layout */
-    .mobile-bottom-nav {
-        display: none; /* Disabling for now as it conflicts with standard navigation */
-    }
-
+    /* Premium Mobile Tweaks - Ensuring it looks good without breaking global shell */
     #content {
-        padding: 15px !important;
-        margin-top: 0 !important;
+        padding: 0 !important; /* Full width for the gradient header to shine */
         width: 100%;
     }
 
+    /* Standard pages (not dashboard) should still have padding */
+    .container-fluid {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
+    /* Except for the dashboard mobile parts */
     .profile-header-gradient {
-        padding-top: 20px !important; 
-        margin-left: -15px;
-        margin-right: -15px;
+        /* Already defined above with correct margins */
     }
 
     .dashboard-container-mobile {
-        padding: 0;
+        padding: 0 20px;
     }
 }
