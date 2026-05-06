@@ -174,7 +174,7 @@
         <h6 class="shots-title mb-0">Atividade Recente</h6>
         <a href="{{ url_for('notices.index') }}" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none">Ver Tudo</a>
     </div>
-    <div class="list-group list-group-flush rounded-4 overflow-hidden shadow-sm mb-5 fade-in-up" style="animation-delay: 0.5s;">
+    <div class="list-group list-group-flush rounded-4 overflow-hidden shadow-sm mb-4 fade-in-up" style="animation-delay: 0.5s;">
         {% if recent_notices %}
         {% for notice in recent_notices[:3] %}
         <div class="list-group-item border-0 px-3 py-3 d-flex align-items-center gap-3 bg-white">
@@ -194,6 +194,53 @@
         </div>
         {% endif %}
     </div>
+
+    <!-- Condominium Flow Chart Mobile -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 fade-in-up" style="animation-delay: 0.6s;">
+        <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">Fluxo do Condomínio</h6>
+            <div style="height: 180px; width: 100%;">
+                {% if visitor_stats %}
+                <canvas id="mainTrendChartMobile"></canvas>
+                {% else %}
+                <div class="h-100 d-flex align-items-center justify-content-center text-muted">
+                    <small>Dados insuficientes</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Summary Mobile -->
+    {% if not current_user.is_porteiro %}
+    <div class="card border-0 shadow-sm rounded-4 mb-5 fade-in-up" style="animation-delay: 0.7s;">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="fw-bold mb-0">Financeiro</h6>
+                <div class="text-success small fw-bold"><i class="bi bi-arrow-up-short"></i> Regular</div>
+            </div>
+            <h3 class="fw-bold text-dark mb-0">
+                {% if current_user.is_admin %}
+                {{ payment_stats.pending_count }} <small class="fs-6 text-muted fw-normal">pendentes</small>
+                {% else %}
+                R$ {{ "%.0f"|format(payment_amount) }}
+                {% endif %}
+            </h3>
+            <div class="mt-4 pt-3 border-top">
+                <div class="row g-0">
+                    <div class="col-6">
+                        <small class="text-muted d-block mb-1">Chamados</small>
+                        <h6 class="fw-bold mb-0 text-danger">{{ chart_data.get('open', 0) }} Abertos</h6>
+                    </div>
+                    <div class="col-6 text-end">
+                        <small class="text-muted d-block mb-1">Visitantes</small>
+                        <h6 class="fw-bold mb-0 text-primary">{{ visitor_stats.get('active', 0) if visitor_stats else 0 }} Ativos</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endif %}
 
@@ -443,6 +490,12 @@
         };
 
     new Chart(ctx, chartConfig);
+    
+    // Initialize Mobile Chart if element exists
+    const ctxMobile = document.getElementById('mainTrendChartMobile');
+    if (ctxMobile) {
+        new Chart(ctxMobile.getContext('2d'), chartConfig);
+    }
     {% endif %}
 
     // --- Restored Charts Logic ---
