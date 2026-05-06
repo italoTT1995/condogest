@@ -35,7 +35,7 @@
                         <td>
                             <div class="d-flex align-items-center">
                                 {% if log.user %}
-                                {% if log.user.profile_image and log.user.profile_image != 'default.jpg' %}
+                                {% if log.user.profile_image and log.user.profile_image not in ['default_avatar.png', 'default.jpg'] %}
                                 <img src="{{ url_for('static', filename='uploads/profiles/' + log.user.profile_image) }}"
                                     class="rounded-circle me-2 object-fit-cover border" width="32" height="32">
                                 {% else %}

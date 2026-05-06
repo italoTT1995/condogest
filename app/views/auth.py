@@ -17,10 +17,9 @@ def login():
     if request.method == 'POST':
         username = request.form['username'].strip().lower() # Normalize input (mobile friendly)
         password = request.form['password']
-        # Try finding by lowercase username. 
-        # Note: If database has mixed case usernames, this might need logic tweak, 
-        # but for 'admin' and standard usernames, lowercase is safer convention.
-        user = User.query.filter(User.username.ilike(username)).first()
+        # Try finding by lowercase username or email.
+        from sqlalchemy import or_
+        user = User.query.filter(or_(User.username.ilike(username), User.email.ilike(username))).first()
         
         from datetime import datetime
         

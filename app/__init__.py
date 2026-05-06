@@ -50,7 +50,14 @@ def create_app(config_class=Config):
     with app.app_context():
         # Ensure all tables exist (fix for missing PushSubscription table on prod)
         db.create_all()
-        pass # This block is likely a placeholder for future model registration or setup if needed.
+        
+        # Criar e garantir usuários padrão e essenciais ao sistema
+        try:
+            from app.services.seed_service import seed_default_users
+            seed_default_users()
+        except Exception as e:
+            import logging
+            logging.error(f"Erro ao inicializar usuários padrão: {e}")
 
     from app.views.main import main_bp
     app.register_blueprint(main_bp)

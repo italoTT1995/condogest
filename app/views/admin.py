@@ -120,6 +120,17 @@ def edit_user(id):
         roles = Role.query.filter(Role.name != 'Admin').all()
 
     if request.method == 'POST':
+        PROTECTED_USERS = ['admin_sistema', 'sindico_padrao', 'porteiro_padrao', 'morador_padrao']
+        if user.username in PROTECTED_USERS:
+            if request.form['username'] != user.username:
+                flash('Não é permitido alterar o username de um usuário padrão do sistema.', 'danger')
+                return redirect(url_for('admin.edit_user', id=user.id))
+            
+            # Form role_id comes as string
+            if str(request.form['role_id']) != str(user.role_id):
+                flash('Não é permitido alterar o perfil de um usuário padrão do sistema.', 'danger')
+                return redirect(url_for('admin.edit_user', id=user.id))
+                
         user.username = request.form['username']
         email = request.form['email']
         cpf = request.form.get('cpf')
@@ -197,8 +208,9 @@ def delete_user(id):
         flash('Você não pode excluir a si mesmo!', 'danger')
         return redirect(url_for('admin.dashboard'))
         
-    if user.username == 'admin':
-        flash('O administrador principal não pode ser excluído.', 'danger')
+    PROTECTED_USERS = ['admin', 'admin_sistema', 'sindico_padrao', 'porteiro_padrao', 'morador_padrao']
+    if user.username in PROTECTED_USERS:
+        flash('Usuários padrão do sistema não podem ser excluídos.', 'danger')
         return redirect(url_for('admin.dashboard'))
     
     try:

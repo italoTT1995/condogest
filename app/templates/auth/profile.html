@@ -7,7 +7,7 @@
             <div class="card-body p-5">
                 <div class="text-center mb-4">
                     <div class="position-relative d-inline-block">
-                        {% if current_user.profile_image and current_user.profile_image != 'default_avatar.png' %}
+                        {% if current_user.profile_image and current_user.profile_image not in ['default_avatar.png', 'default.jpg'] %}
                         <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_image) }}"
                             class="rounded-circle object-fit-cover shadow-sm" width="120" height="120"
                             alt="Foto de Perfil">

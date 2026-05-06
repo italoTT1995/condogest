@@ -298,7 +298,7 @@
               <li class="nav-item dropdown px-2">
                 <a class="nav-link fw-bold text-dark d-flex align-items-center px-0" href="#" id="userDropdown"
                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  {% if current_user.profile_image and current_user.profile_image != 'default_avatar.png' %}
+                  {% if current_user.profile_image and current_user.profile_image not in ['default_avatar.png', 'default.jpg'] %}
                   <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_image) }}"
                     alt="Avatar" class="rounded-circle me-md-2 object-fit-cover border" width="32" height="32">
                   {% else %}
