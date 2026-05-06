@@ -20,7 +20,6 @@
     --text-inverse: #ffffff;
 
     --border-color: transparent;
-    /* No borders in this theme */
     --border-color-subtle: rgba(163, 174, 208, 0.2);
 
     --sidebar-width: 280px;
@@ -588,14 +587,28 @@ a {
     }
 
     /* --- Premium Mobile Shell --- */
+    /* Premium Mobile Shell - Full Transparency & App Feel */
+    .navbar {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        z-index: 1060;
+        margin: 0 !important;
+        padding-top: 15px !important;
+    }
+
     .mobile-bottom-nav {
+        display: flex !important;
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         height: 75px;
         background: var(--bg-surface);
-        display: flex;
         justify-content: space-around;
         align-items: center;
         border-top: 1px solid var(--border-color-subtle);
@@ -628,20 +641,6 @@ a {
 
     .mobile-nav-item:active i {
         transform: scale(0.85);
-    }
-
-    /* Premium Mobile Shell - Full Transparency & App Feel */
-    .navbar {
-        position: absolute !important;
-        top: 0;
-        left: 0;
-        right: 0;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        z-index: 1060;
-        margin: 0 !important;
-        padding-top: 15px !important;
     }
 
     .navbar .bi, .navbar .nav-link, .navbar #sidebarCollapse {
