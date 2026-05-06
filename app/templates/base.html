@@ -17,6 +17,96 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="CondoGest">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/logo.png') }}">
+  <style>
+    /* SOS Emergency Styles */
+    .sos-navbar-btn {
+      color: #dc3545 !important;
+      font-weight: bold;
+      animation: pulse-red 2s infinite;
+    }
+    .sos-float-btn {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #dc3545;
+      color: white;
+      border: none;
+      box-shadow: 0 4px 15px rgba(220, 53, 69, 0.5);
+      z-index: 1040;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: pulse-bg-red 2s infinite;
+    }
+    .sos-float-btn i { font-size: 1.5rem; line-height: 1; }
+    .sos-float-btn span { font-size: 0.6rem; font-weight: bold; }
+    @keyframes pulse-red {
+      0% { color: #dc3545; }
+      50% { color: #ff0000; text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+      100% { color: #dc3545; }
+    }
+    @keyframes pulse-bg-red {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+    
+    /* SOS Type Cards */
+    .sos-type-card {
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #f8f9fa;
+    }
+    .sos-type-card.police:hover { border-color: #0d6efd; background: #e9ecef; }
+    .sos-type-card.police i { color: #0d6efd; font-size: 2.5rem; }
+    .sos-type-card.porteiro:hover { border-color: #dc3545; background: #e9ecef; }
+    .sos-type-card.porteiro i { color: #dc3545; font-size: 2.5rem; }
+    
+    /* Fullscreen Emergency Overlay */
+    .emergency-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+    }
+    .emergency-overlay.police { background: rgba(13, 110, 253, 0.95); animation: flash-blue 1s infinite alternate; }
+    .emergency-overlay.porteiro { background: rgba(220, 53, 69, 0.95); animation: flash-red 1s infinite alternate; }
+    
+    .emergency-overlay-content {
+      background: #fff;
+      color: #000;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: shake 0.5s infinite;
+      max-width: 90%;
+      width: 400px;
+    }
+    .emergency-overlay i.icon-police { color: #0d6efd; font-size: 4rem; animation: pulse-bg-blue 1s infinite; }
+    .emergency-overlay i.icon-porteiro { color: #dc3545; font-size: 4rem; animation: pulse-bg-red 1s infinite; }
+    
+    @keyframes flash-red { from { background: rgba(220, 53, 69, 0.95); } to { background: rgba(180, 0, 0, 0.95); } }
+    @keyframes flash-blue { from { background: rgba(13, 110, 253, 0.95); } to { background: rgba(0, 50, 180, 0.95); } }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px) rotate(-2deg); }
+      50% { transform: translateX(5px) rotate(2deg); }
+      75% { transform: translateX(-5px) rotate(-2deg); }
+      100% { transform: translateX(0); }
+    }
+  </style>
 </head>
 
 <body>
@@ -241,6 +331,12 @@
                   <span class="d-none d-md-inline">Transparência</span>
                 </a>
               </li>
+              <!-- Botão SOS Navbar (Desktop) -->
+              <li class="nav-item px-2 d-none d-md-block">
+                <button class="btn nav-link border-0 sos-navbar-btn" onclick="openSOSModal()" title="Emergência SOS">
+                  <i class="bi bi-exclamation-octagon-fill me-1"></i> SOS
+                </button>
+              </li>
               <!-- Theme Toggle -->
               <li class="nav-item px-2">
                 <button class="btn nav-link border-0" id="themeToggle" title="Alternar Tema">
@@ -347,6 +443,117 @@
       </div>
     </div>
   </div>
+
+  <!-- Botão Flutuante SOS (Mobile) -->
+  <button id="sosBtnMobile" onclick="openSOSModal()" class="sos-float-btn d-md-none" title="Emergência SOS">
+    <i class="bi bi-exclamation-octagon-fill"></i>
+    <span>SOS</span>
+  </button>
+
+  <!-- Modal SOS Picker -->
+  <div class="modal fade" id="sosModal" tabindex="-1" aria-labelledby="sosModalLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        
+        <!-- Passo 1: Picker -->
+        <div id="sosPicker" style="display: block;">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold" id="sosModalLabel">🚨 O que aconteceu?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <p class="text-muted mb-4">Escolha o tipo de emergência para prosseguirmos rapidamente.</p>
+            
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="sos-type-card police" onclick="selectSOSType('police')">
+                  <i class="bi bi-shield-shaded mb-2"></i>
+                  <h6 class="fw-bold mb-0">Polícia /<br>Bombeiros</h6>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="sos-type-card porteiro" onclick="selectSOSType('porteiro')">
+                  <i class="bi bi-bell-fill mb-2"></i>
+                  <h6 class="fw-bold mb-0">Chamar<br>Portaria</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passo 2: Polícia -->
+        <div id="sosPoliceConfirm" style="display: none;">
+          <div class="modal-header border-0 pb-0 bg-primary text-white rounded-top">
+            <button type="button" class="btn btn-link text-white p-0 border-0" onclick="openSOSModal()"><i class="bi bi-arrow-left fs-5"></i></button>
+            <h5 class="modal-title fw-bold ms-3"><i class="bi bi-shield-shaded"></i> Emergência Policial</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center mt-3">
+            <p class="mb-4">Para casos graves. Você pode ligar diretamente para as autoridades ou apenas avisar a portaria.</p>
+            
+            <div class="d-grid gap-2 mb-4">
+              <a href="tel:190" class="btn btn-outline-primary btn-lg fw-bold"><i class="bi bi-telephone-fill me-2"></i>Ligar 190 (Polícia)</a>
+              <a href="tel:193" class="btn btn-outline-danger btn-lg fw-bold"><i class="bi bi-telephone-fill me-2"></i>Ligar 193 (Bombeiros)</a>
+              <a href="tel:192" class="btn btn-outline-danger btn-lg fw-bold"><i class="bi bi-telephone-fill me-2"></i>Ligar 192 (SAMU)</a>
+            </div>
+            
+            <hr>
+            <p class="small text-muted mb-2">Avisar o síndico e o porteiro silenciosamente?</p>
+            <button class="btn btn-primary btn-lg w-100 fw-bold" onclick="triggerSOS('emergency_police')" id="btnConfirmPolice">
+              <i class="bi bi-broadcast me-2"></i> ALERTAR PORTARIA
+            </button>
+          </div>
+        </div>
+
+        <!-- Passo 2: Porteiro -->
+        <div id="sosPorteiroConfirm" style="display: none;">
+          <div class="modal-header border-0 pb-0 bg-danger text-white rounded-top">
+            <button type="button" class="btn btn-link text-white p-0 border-0" onclick="openSOSModal()"><i class="bi bi-arrow-left fs-5"></i></button>
+            <h5 class="modal-title fw-bold ms-3"><i class="bi bi-bell-fill"></i> Alerta de Portaria</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center mt-3">
+            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+            <h4 class="mt-3 fw-bold">Acionar Alarme Interno?</h4>
+            <p class="text-muted">A portaria e o síndico receberão um alerta pulsante na tela com a sua identificação.</p>
+            
+            <div class="bg-light p-3 rounded-3 text-start mb-4">
+              <strong>Seu Alerta:</strong><br>
+              <span class="text-danger fw-bold"><i class="bi bi-geo-alt-fill"></i> {{ current_user.unit_block }} - {{ current_user.unit_number }}</span><br>
+              <small>{{ current_user.name }}</small>
+            </div>
+            
+            <button class="btn btn-danger btn-lg w-100 fw-bold" onclick="triggerSOS('emergency_porteiro')" id="btnConfirmPorteiro">
+              <i class="bi bi-alarm-fill me-2"></i> SIM, ENVIAR ALERTA!
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Emergency Overlay (Somente para Síndico e Porteiro) -->
+  {% if current_user.role and current_user.role.name in ['SINDICO', 'PORTEIRO', 'ADMIN'] %}
+  <div id="emergencyOverlay" class="emergency-overlay">
+    <div class="emergency-overlay-content">
+      <i id="emergencyIcon" class="bi bi-exclamation-triangle-fill"></i>
+      <h1 class="fw-bold mt-3 text-dark" style="letter-spacing: -1px; font-size: 2.5rem;">EMERGÊNCIA</h1>
+      <h3 id="emergencyTypeTitle" class="fw-bold mb-1">...</h3>
+      
+      <div class="bg-light rounded p-3 my-4 text-start border-start border-danger border-4">
+        <h5 class="fw-bold text-dark mb-1" id="emergencySolicitante">Carregando...</h5>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <span class="badge bg-dark fs-6" id="emergencyTime">--:--</span>
+        </div>
+      </div>
+      
+      <button class="btn btn-dark btn-lg w-100 fw-bold py-3" onclick="dismissEmergency()" id="dismissEmergencyBtn">
+        <i class="bi bi-check-circle-fill me-2"></i> CONFIRMAR RECEBIMENTO
+      </button>
+    </div>
+  </div>
+  {% endif %}
   {% else %}
   <!-- Login Page Layout (No Sidebar) -->
   {% block guest_layout %}
@@ -437,6 +644,146 @@
         }
       }
     });
+    // ── SOS Logic ──
+    const sosModal = new bootstrap.Modal(document.getElementById('sosModal'));
+    
+    function openSOSModal() {
+        document.getElementById('sosPicker').style.display = 'block';
+        document.getElementById('sosPoliceConfirm').style.display = 'none';
+        document.getElementById('sosPorteiroConfirm').style.display = 'none';
+        sosModal.show();
+    }
+    
+    function selectSOSType(type) {
+        document.getElementById('sosPicker').style.display = 'none';
+        if(type === 'police') {
+            document.getElementById('sosPoliceConfirm').style.display = 'block';
+        } else {
+            document.getElementById('sosPorteiroConfirm').style.display = 'block';
+        }
+    }
+    
+    function triggerSOS(type) {
+        let btn = type === 'emergency_police' ? document.getElementById('btnConfirmPolice') : document.getElementById('btnConfirmPorteiro');
+        let originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando...';
+        btn.disabled = true;
+
+        fetch('/notifications/emergency', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ type: type })
+        }).then(response => response.json()).then(data => {
+            btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Alerta Enviado!';
+            btn.classList.remove('btn-danger', 'btn-primary');
+            btn.classList.add('btn-success');
+            setTimeout(() => {
+                sosModal.hide();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove('btn-success');
+                btn.classList.add(type === 'emergency_police' ? 'btn-primary' : 'btn-danger');
+            }, 2000);
+        }).catch(err => {
+            alert('Erro ao enviar alerta. Verifique sua conexão.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    // ── Emergency Polling Logic (Síndico/Porteiro) ──
+    {% if current_user.role and current_user.role.name in ['SINDICO', 'PORTEIRO', 'ADMIN'] %}
+    let currentEmergencyId = null;
+    let emergencyAudioContext = null;
+
+    function playSiren() {
+        if (!emergencyAudioContext) {
+            emergencyAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (emergencyAudioContext.state === 'suspended') {
+            emergencyAudioContext.resume();
+        }
+        
+        // Toca 3 beeps rápidos
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                const osc = emergencyAudioContext.createOscillator();
+                const gainNode = emergencyAudioContext.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, emergencyAudioContext.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, emergencyAudioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.1, emergencyAudioContext.currentTime); // volume
+                gainNode.gain.exponentialRampToValueAtTime(0.01, emergencyAudioContext.currentTime + 0.3);
+                
+                osc.connect(gainNode);
+                gainNode.connect(emergencyAudioContext.destination);
+                osc.start();
+                osc.stop(emergencyAudioContext.currentTime + 0.3);
+            }, i * 400);
+        }
+    }
+
+    function checkEmergency() {
+        fetch('/notifications/check_emergency')
+            .then(res => res.json())
+            .then(data => {
+                if (data.emergency) {
+                    if (currentEmergencyId !== data.id) {
+                        currentEmergencyId = data.id;
+                        
+                        const overlay = document.getElementById('emergencyOverlay');
+                        const icon = document.getElementById('emergencyIcon');
+                        const typeTitle = document.getElementById('emergencyTypeTitle');
+                        
+                        // Configurar cores e ícones baseados no tipo
+                        overlay.className = 'emergency-overlay ' + (data.type === 'emergency_police' ? 'police' : 'porteiro');
+                        icon.className = 'icon-' + (data.type === 'emergency_police' ? 'police bi bi-shield-shaded' : 'porteiro bi bi-bell-fill');
+                        typeTitle.innerText = data.type === 'emergency_police' ? 'Aviso Policial / Bombeiros' : 'Aviso à Portaria';
+                        
+                        document.getElementById('emergencySolicitante').innerText = data.solicitante;
+                        document.getElementById('emergencyTime').innerText = data.time;
+                        
+                        overlay.style.display = 'flex';
+                        playSiren();
+                    }
+                }
+            })
+            .catch(e => console.log('Polling error', e));
+    }
+
+    function dismissEmergency() {
+        if (!currentEmergencyId) return;
+        
+        let btn = document.getElementById('dismissEmergencyBtn');
+        btn.innerHTML = 'Processando...';
+        btn.disabled = true;
+
+        fetch(`/notifications/read/${currentEmergencyId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        }).then(res => res.json()).then(data => {
+            if(data.success) {
+                document.getElementById('emergencyOverlay').style.display = 'none';
+                currentEmergencyId = null;
+            }
+            btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> CONFIRMAR RECEBIMENTO';
+            btn.disabled = false;
+        }).catch(err => {
+            btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> CONFIRMAR RECEBIMENTO';
+            btn.disabled = false;
+        });
+    }
+
+    // Poll every 5 seconds
+    setInterval(checkEmergency, 5000);
+    {% endif %}
   </script>
 </body>
 

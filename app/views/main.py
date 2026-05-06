@@ -10,6 +10,16 @@ from app.models.core import Ticket, Notice, Payment
 def landing():
     return render_template('landing.html')
 
+@main_bp.route('/tuneo')
+def tuneo():
+    import os
+    from flask import current_app
+    tuneo_path = os.path.join(current_app.root_path, '..', 'tuneo', 'index.html')
+    if os.path.exists(tuneo_path):
+        with open(tuneo_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    return "Tuneo file not found", 404
+
 @main_bp.route('/debug/db')
 def debug_db():
     from flask import current_app

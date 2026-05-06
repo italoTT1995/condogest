@@ -105,8 +105,79 @@ def send_web_push(user_id, message_body):
 @notifications_bp.route('/vapid_public_key')
 def get_vapid_public_key():
     import os
-    # Fallback to a dummy key if env var not set to prevent JS errors, 
-    # but strictly speaking it wont work without a real key pair.
-    # User needs to run generate_vapid_keys.py
     pub_key = os.environ.get('VAPID_PUBLIC_KEY')
     return jsonify({'publicKey': pub_key})
+
+@notifications_bp.route('/emergency', methods=['POST'])
+@login_required
+def trigger_emergency():
+    """Dispara alerta de emergência para todos os síndicos e porteiros do condomínio."""
+    from app.models.user import User, Role
+    from datetime import datetime
+
+    data = request.get_json() or {}
+    emergency_type = data.get('type', 'emergency_police') # emergency_police ou emergency_porteiro
+
+    # Obter todos os usuários que são síndicos ou porteiros
+    roles_to_alert = ['SINDICO', 'PORTEIRO', 'ADMIN']
+    users_to_alert = User.query.join(Role).filter(Role.name.in_(roles_to_alert)).all()
+    
+    if not users_to_alert:
+        return jsonify({'error': 'Nenhum contato de emergência encontrado no sistema.'}), 404
+
+    # Tagging message
+    tag = "[🚨 POLÍCIA]" if emergency_type == 'emergency_police' else "[🔔 PORTEIRO]"
+    
+    # Criar notificação para cada um
+    message = f"{tag} EMERGÊNCIA ACIONADA por: {current_user.name} ({current_user.unit_block} - {current_user.unit_number})"
+    
+    for u in users_to_alert:
+        # Não enviar para si mesmo (caso o porteiro aperte, os outros recebem)
+        if u.id != current_user.id:
+            notif = Notification(
+                user_id=u.id, 
+                message=message, 
+                notification_type=emergency_type
+            )
+            db.session.add(notif)
+            
+            # Tentar enviar push (se configurado)
+            send_web_push(u.id, message)
+            
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Alerta de emergência enviado!'})
+
+@notifications_bp.route('/check_emergency', methods=['GET'])
+@login_required
+def check_emergency():
+    """Endpoint de polling para a interface tocar a sirene de emergência"""
+    from app.models.user import Role
+    
+    # Apenas porteiros e síndicos (e admins) devem ficar fazendo polling
+    if not current_user.role or current_user.role.name not in ['SINDICO', 'PORTEIRO', 'ADMIN']:
+        return jsonify({'emergency': False})
+        
+    # Buscar a emergência mais recente não lida
+    latest_emergency = Notification.query.filter(
+        Notification.user_id == current_user.id,
+        Notification.is_read == False,
+        Notification.notification_type.in_(['emergency_police', 'emergency_porteiro'])
+    ).order_by(Notification.created_at.desc()).first()
+    
+    if latest_emergency:
+        # Identificar quem mandou a emergência pelo texto (simplificação)
+        # O padrão é: "[TAG] EMERGÊNCIA ACIONADA por: Nome (Bloco - Numero)"
+        import re
+        parts = latest_emergency.message.split(' por: ')
+        solicitante = parts[1] if len(parts) > 1 else "Desconhecido"
+        
+        return jsonify({
+            'emergency': True,
+            'id': latest_emergency.id,
+            'type': latest_emergency.notification_type,
+            'message': latest_emergency.message,
+            'solicitante': solicitante,
+            'time': latest_emergency.created_at.strftime('%H:%M')
+        })
+        
+    return jsonify({'emergency': False})

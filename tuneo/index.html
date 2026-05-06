@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ítalo | Link-in-Bio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+        .tuneo-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-out;
+        }
+        .avatar-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(45deg, #00f2fe, #4facfe, #00f2fe);
+            animation: spin 3s linear infinite;
+        }
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #1a1a2e;
+        }
+        .badge-tech {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            margin: 5px;
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+        .badge-tech:hover {
+            background: #4facfe;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .link-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 16px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .link-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            color: #fff;
+        }
+        .link-btn i {
+            font-size: 1.5rem;
+        }
+        .project-highlight {
+            background: linear-gradient(45deg, #ff0844 0%, #ffb199 100%);
+            border: none;
+            box-shadow: 0 10px 20px rgba(255, 8, 68, 0.3);
+        }
+        .project-highlight:hover {
+            background: linear-gradient(45deg, #ffb199 0%, #ff0844 100%);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+            100% { filter: hue-rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="tuneo-card mx-auto">
+                    
+                    <div class="avatar-container">
+                        <img src="https://ui-avatars.com/api/?name=Italo&background=0D8ABC&color=fff&size=256" alt="Ítalo" class="avatar">
+                    </div>
+
+                    <h2 class="fw-bold mb-1">Ítalo</h2>
+                    <p class="text-white-50 mb-4">Desenvolvedor Full Stack Python & Node</p>
+
+                    <div class="mb-4">
+                        <span class="badge-tech">Python</span>
+                        <span class="badge-tech">Flask</span>
+                        <span class="badge-tech">Node.js</span>
+                        <span class="badge-tech">Render</span>
+                        <span class="badge-tech">PostgreSQL</span>
+                    </div>
+
+                    <div class="links-container text-start mt-5">
+                        <h6 class="text-white-50 text-uppercase mb-3 px-2 fw-bold" style="letter-spacing: 2px; font-size: 0.8rem;">Meus Projetos</h6>
+                        
+                        <a href="/" class="link-btn project-highlight">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-buildings me-3"></i>
+                                <div>
+                                    <div class="fs-5">CondoGest</div>
+                                    <div class="small fw-normal" style="opacity: 0.8;">Sistema Inteligente de Condomínios</div>
+                                </div>
+                            </div>
+                            <i class="bi bi-arrow-right-short fs-3"></i>
+                        </a>
+
+                        <h6 class="text-white-50 text-uppercase mt-4 mb-3 px-2 fw-bold" style="letter-spacing: 2px; font-size: 0.8rem;">Contato & Social</h6>
+
+                        <a href="https://github.com/italoTT1995" target="_blank" class="link-btn">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-github me-3"></i>
+                                <span>GitHub</span>
+                            </div>
+                            <i class="bi bi-box-arrow-up-right text-white-50"></i>
+                        </a>
+
+                        <a href="#" class="link-btn">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-linkedin me-3 text-info"></i>
+                                <span>LinkedIn</span>
+                            </div>
+                            <i class="bi bi-box-arrow-up-right text-white-50"></i>
+                        </a>
+                        
+                        <a href="#" class="link-btn">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-envelope-at me-3 text-warning"></i>
+                                <span>Email</span>
+                            </div>
+                            <i class="bi bi-box-arrow-up-right text-white-50"></i>
+                        </a>
+                    </div>
+
+                    <div class="mt-5 text-white-50 small">
+                        Criado com ❤️ usando Flask & Render
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
