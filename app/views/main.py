@@ -5,6 +5,59 @@ main_bp = Blueprint('main', __name__)
 
 from app.models.core import Ticket, Notice, Payment
 
+@main_bp.route('/debug/error')
+def debug_error():
+    """Rota pública de diagnóstico para identificar erros de produção."""
+    import traceback
+    from flask import jsonify
+    from app import db
+    from sqlalchemy import text
+    errors = {}
+    
+    # 1. Testar conexão com o banco
+    try:
+        with db.engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        errors['db_connection'] = 'OK'
+    except Exception as e:
+        errors['db_connection'] = str(e)
+    
+    # 2. Testar query de notificações (provável culpado)
+    try:
+        from app.models.notification import Notification
+        Notification.query.limit(1).all()
+        errors['notification_query'] = 'OK'
+    except Exception as e:
+        errors['notification_query'] = str(e)
+    
+    # 3. Testar query de User
+    try:
+        from app.models.user import User
+        User.query.limit(1).all()
+        errors['user_query'] = 'OK'
+    except Exception as e:
+        errors['user_query'] = str(e)
+
+    # 4. Testar colunas da tabela user
+    try:
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        cols = [c['name'] for c in inspector.get_columns('user')]
+        errors['user_columns'] = cols
+    except Exception as e:
+        errors['user_columns'] = str(e)
+
+    # 5. Testar colunas de notification
+    try:
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        cols = [c['name'] for c in inspector.get_columns('notifications')]
+        errors['notification_columns'] = cols
+    except Exception as e:
+        errors['notification_columns'] = str(e)
+
+    return jsonify(errors)
+
 
 @main_bp.route('/presentation')
 def landing():
