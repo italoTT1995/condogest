@@ -129,12 +129,14 @@ def create_app(config_class=Config):
     
     @app.context_processor
     def inject_notifications():
-        if current_user.is_authenticated:
-            # Assuming 'admin' in user logic means checking 'is_admin' property if using complex roles
-            # But here we just fetch personal notifications.
-            unread = Notification.query.filter_by(user_id=current_user.id, is_read=False).count()
-            notifs = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.created_at.desc()).limit(10).all()
-            return dict(unread_notifications_count=unread, recent_notifications=notifs)
+        try:
+            if current_user.is_authenticated:
+                unread = Notification.query.filter_by(user_id=current_user.id, is_read=False).count()
+                notifs = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.created_at.desc()).limit(10).all()
+                return dict(unread_notifications_count=unread, recent_notifications=notifs)
+        except Exception as e:
+            import logging
+            logging.error(f"Erro no context_processor de notificações: {e}")
         return dict(unread_notifications_count=0, recent_notifications=[])
 
     return app
