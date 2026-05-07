@@ -120,7 +120,7 @@ def trigger_emergency():
 
     # Obter todos os usuários que são síndicos ou porteiros
     roles_to_alert = ['SINDICO', 'PORTEIRO', 'ADMIN']
-    users_to_alert = User.query.join(Role).filter(Role.name.in_(roles_to_alert)).all()
+    users_to_alert = User.query.join(Role).filter(Role.name.in_(['Sindico', 'Síndico', 'Porteiro', 'Admin'])).all()
     
     if not users_to_alert:
         return jsonify({'error': 'Nenhum contato de emergência encontrado no sistema.'}), 404
@@ -154,7 +154,7 @@ def check_emergency():
     from app.models.user import Role
     
     # Apenas porteiros e síndicos (e admins) devem ficar fazendo polling
-    if not current_user.role or current_user.role.name not in ['SINDICO', 'PORTEIRO', 'ADMIN']:
+    if not current_user.user_role or current_user.user_role.name not in ['Síndico', 'Sindico', 'Porteiro', 'Admin']:
         return jsonify({'emergency': False})
         
     # Buscar a emergência mais recente não lida
