@@ -41,12 +41,29 @@ def migrate():
         add_column('user', 'condo_id', 'INTEGER REFERENCES condominium(id)')
         add_column('user', 'access_token', 'VARCHAR(100)')
         
-        # 3. Atualizar outras tabelas
+        # 3. Atualizar tabela 'notice' (Avisos)
+        add_column('notice', 'image_filename', 'VARCHAR(255)')
+        add_column('notice', 'is_important', 'BOOLEAN DEFAULT FALSE')
+        add_column('notice', 'condo_id', 'INTEGER REFERENCES condominium(id)')
+        
+        # 4. Atualizar tabela 'payment' e 'expense' (Financeiro)
+        add_column('payment', 'unit_id', 'INTEGER REFERENCES unit(id)')
+        add_column('payment', 'condo_id', 'INTEGER REFERENCES condominium(id)')
+        add_column('expense', 'proof_filename', 'VARCHAR(255)')
+        add_column('expense', 'condo_id', 'INTEGER REFERENCES condominium(id)')
+        
+        # 5. Atualizar tabela 'unit'
         add_column('unit', 'condo_id', 'INTEGER REFERENCES condominium(id)')
+        
+        # 6. Atualizar tabela 'ticket' (Chamados/Denúncias)
+        add_column('ticket', 'category', "VARCHAR(20) DEFAULT 'maintenance'")
+        add_column('ticket', 'image_filename', 'VARCHAR(255)')
+        
+        # 7. Atualizar outras tabelas
         add_column('reservation', 'access_token', 'VARCHAR(100)')
         add_column('common_area', 'condo_id', 'INTEGER REFERENCES condominium(id)')
 
-        # 4. Garantir Roles básicas se não existirem
+        # 8. Garantir Roles básicas se não existirem
         from app.models.user import Role
         roles = [
             {'name': 'Admin', 'description': 'Acesso total', 'is_admin': True, 'can_manage_concierge': True, 'can_manage_reservations': True, 'can_manage_complaints': True},
