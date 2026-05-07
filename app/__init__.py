@@ -137,6 +137,12 @@ def create_app(config_class=Config):
         except Exception as e:
             import logging
             logging.error(f"Erro no context_processor de notificações: {e}")
+            # CRITICAL: rollback the broken transaction so the page can still render
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
         return dict(unread_notifications_count=0, recent_notifications=[])
+
 
     return app

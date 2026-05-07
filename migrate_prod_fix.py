@@ -32,7 +32,10 @@ def migrate():
             except Exception as e:
                 print(f"Nota ao processar '{column_name}' em '{table_name}': {e}")
 
-        # 2. Atualizar tabela 'user' com colunas de segurança e novas funções
+        # 2. Atualizar tabela 'notifications' - CAUSA RAIZ DO ERRO 500
+        add_column('notifications', 'notification_type', "VARCHAR(50) DEFAULT 'info'")
+        
+        # 3. Atualizar tabela 'user' com colunas de segurança e novas funções
         add_column('user', 'profile_image', "VARCHAR(255) DEFAULT 'default.jpg'")
         add_column('user', 'role_id', 'INTEGER REFERENCES role(id)')
         add_column('user', 'failed_login_attempts', 'INTEGER DEFAULT 0')
