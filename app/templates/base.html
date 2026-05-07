@@ -747,32 +747,66 @@
     {% if current_user.user_role and current_user.user_role.name in ['Síndico', 'Sindico', 'Porteiro', 'Admin'] %}
     let currentEmergencyId = null;
     let emergencyAudioContext = null;
+    let sirenInterval = null;
+    let vibInterval = null;
+
+    // Pedir permissão de notificação do browser ao carregar
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
 
     function playSiren() {
-        if (!emergencyAudioContext) {
-            emergencyAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (sirenInterval) clearInterval(sirenInterval);
+
+        // Vibração forte e repetida no celular
+        if ('vibrate' in navigator) {
+            navigator.vibrate([800, 200, 800, 200, 800, 200, 1000]);
         }
-        if (emergencyAudioContext.state === 'suspended') {
-            emergencyAudioContext.resume();
-        }
-        
-        // Toca 3 beeps rápidos
-        for (let i = 0; i < 3; i++) {
-            setTimeout(() => {
-                const osc = emergencyAudioContext.createOscillator();
-                const gainNode = emergencyAudioContext.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, emergencyAudioContext.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1200, emergencyAudioContext.currentTime + 0.1);
-                
-                gainNode.gain.setValueAtTime(0.1, emergencyAudioContext.currentTime); // volume
-                gainNode.gain.exponentialRampToValueAtTime(0.01, emergencyAudioContext.currentTime + 0.3);
-                
-                osc.connect(gainNode);
-                gainNode.connect(emergencyAudioContext.destination);
+
+        let count = 0;
+        function playOneTone() {
+            if (count >= 8) { clearInterval(sirenInterval); return; }
+            count++;
+            try {
+                if (!emergencyAudioContext) {
+                    emergencyAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (emergencyAudioContext.state === 'suspended') emergencyAudioContext.resume();
+
+                const ctx = emergencyAudioContext;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(1400, ctx.currentTime + 0.5);
+                osc.frequency.linearRampToValueAtTime(440, ctx.currentTime + 1.0);
+
+                gain.gain.setValueAtTime(1.0, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.1);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
                 osc.start();
-                osc.stop(emergencyAudioContext.currentTime + 0.3);
-            }, i * 400);
+                osc.stop(ctx.currentTime + 1.1);
+            } catch(e) { console.log('Audio error:', e); }
+        }
+
+        playOneTone();
+        sirenInterval = setInterval(playOneTone, 1300);
+    }
+
+    function sendBrowserNotification(data) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            const title = data.type === 'emergency_police' ? '🚨 EMERGÊNCIA POLICIAL!' : '🔔 ALERTA DE PORTARIA!';
+            const body = `Solicitante: ${data.solicitante}  |  ${data.time}`;
+            const notif = new Notification(title, {
+                body: body,
+                icon: '/static/img/logo.png',
+                requireInteraction: true,
+                tag: 'sos-emergency'
+            });
+            notif.onclick = () => { window.focus(); notif.close(); };
         }
     }
 
@@ -783,21 +817,33 @@
                 if (data.emergency) {
                     if (currentEmergencyId !== data.id) {
                         currentEmergencyId = data.id;
-                        
+
                         const overlay = document.getElementById('emergencyOverlay');
                         const icon = document.getElementById('emergencyIcon');
                         const typeTitle = document.getElementById('emergencyTypeTitle');
-                        
-                        // Configurar cores e ícones baseados no tipo
+
                         overlay.className = 'emergency-overlay ' + (data.type === 'emergency_police' ? 'police' : 'porteiro');
                         icon.className = 'icon-' + (data.type === 'emergency_police' ? 'police bi bi-shield-shaded' : 'porteiro bi bi-bell-fill');
-                        typeTitle.innerText = data.type === 'emergency_police' ? 'Aviso Policial / Bombeiros' : 'Aviso à Portaria';
-                        
+                        typeTitle.innerText = data.type === 'emergency_police' ? '🚨 Aviso Policial / Bombeiros' : '🔔 Aviso à Portaria';
+
                         document.getElementById('emergencySolicitante').innerText = data.solicitante;
                         document.getElementById('emergencyTime').innerText = data.time;
-                        
+
                         overlay.style.display = 'flex';
+
+                        // Triplo alerta: sirene + vibração + notificação nativa
                         playSiren();
+                        sendBrowserNotification(data);
+
+                        // Vibração repetida a cada 3s enquanto overlay estiver visível
+                        if (vibInterval) clearInterval(vibInterval);
+                        vibInterval = setInterval(() => {
+                            if (overlay.style.display !== 'none') {
+                                if ('vibrate' in navigator) navigator.vibrate([500, 200, 500]);
+                            } else {
+                                clearInterval(vibInterval);
+                            }
+                        }, 3000);
                     }
                 }
             })
@@ -806,19 +852,19 @@
 
     function dismissEmergency() {
         if (!currentEmergencyId) return;
-        
+        if (sirenInterval) clearInterval(sirenInterval);
+        if (vibInterval) clearInterval(vibInterval);
+        if ('vibrate' in navigator) navigator.vibrate(0); // Para vibração
+
         let btn = document.getElementById('dismissEmergencyBtn');
         btn.innerHTML = 'Processando...';
         btn.disabled = true;
 
         fetch(`/notifications/read/${currentEmergencyId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'
-            }
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' }
         }).then(res => res.json()).then(data => {
-            if(data.success) {
+            if (data.success) {
                 document.getElementById('emergencyOverlay').style.display = 'none';
                 currentEmergencyId = null;
             }
@@ -830,8 +876,8 @@
         });
     }
 
-    // Poll every 5 seconds
-    setInterval(checkEmergency, 5000);
+    // Poll a cada 3 segundos para resposta mais rápida
+    setInterval(checkEmergency, 3000);
     {% endif %}
   </script>
 </body>
