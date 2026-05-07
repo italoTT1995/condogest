@@ -275,7 +275,7 @@
             </div>
             <h3 class="fw-bold text-dark mb-0">
                 {% if current_user.is_admin %}
-                {{ payment_stats.pending_count }} <small class="fs-6 text-muted fw-normal">pendentes</small>
+                {{ payment_stats.get('pending_count', 0) if payment_stats else 0 }} <small class="fs-6 text-muted fw-normal">pendentes</small>
                 {% else %}
                 R$ {{ "%.0f"|format(payment_amount) }}
                 {% endif %}
@@ -342,7 +342,7 @@
                     <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Financeiro</small>
                     <h2 class="fw-bold text-dark mb-0 mt-2">
                         {% if current_user.is_admin %}
-                        {{ payment_stats.pending_count }} <span class="fs-6 text-muted fw-normal">pendentes</span>
+                        {{ payment_stats.get('pending_count', 0) if payment_stats else 0 }} <span class="fs-6 text-muted fw-normal">pendentes</span>
                         {% else %}
                         R$ {{ "%.0f"|format(payment_amount) }}
                         {% endif %}
@@ -609,7 +609,11 @@
     const ticketsData = {
         labels: ['Aberto', 'Andamento', 'Concluído'],
         datasets: [{
-            data: [{{ chart_data.get('open', 0) }}, {{ chart_data.get('progress', 0) }}, {{ chart_data.get('closed', 0) }}],
+            data: [
+                {{ chart_data.get('open', 0) if chart_data else 0 }}, 
+                {{ chart_data.get('progress', 0) if chart_data else 0 }}, 
+                {{ chart_data.get('closed', 0) if chart_data else 0 }}
+            ],
             backgroundColor: ['#E31A1A', '#FFB547', '#05CD99'],
             barPercentage: 0.5
         }]
@@ -627,7 +631,10 @@
     const paymentsData = {
         labels: ['Pendente', 'Pago'],
         datasets: [{
-            data: [{{ payment_stats.pending_count }}, {{ payment_stats.paid_count }}],
+            data: [
+                {{ payment_stats.get('pending_count', 0) if payment_stats else 0 }}, 
+                {{ payment_stats.get('paid_count', 0) if payment_stats else 0 }}
+            ],
             backgroundColor: ['#FFB547', '#05CD99'],
             barPercentage: 0.5
         }]
