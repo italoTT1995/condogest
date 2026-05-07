@@ -116,36 +116,51 @@ def trigger_emergency():
     from datetime import datetime
 
     data = request.get_json() or {}
-    emergency_type = data.get('type', 'emergency_police') # emergency_police ou emergency_porteiro
+    emergency_type = data.get('type', 'emergency_police')
 
-    # Obter todos os usuários que são síndicos ou porteiros
-    roles_to_alert = ['SINDICO', 'PORTEIRO', 'ADMIN']
-    users_to_alert = User.query.join(Role).filter(Role.name.in_(['Sindico', 'Síndico', 'Porteiro', 'Admin'])).all()
-    
-    if not users_to_alert:
-        return jsonify({'error': 'Nenhum contato de emergência encontrado no sistema.'}), 404
-
-    # Tagging message
     tag = "[🚨 POLÍCIA]" if emergency_type == 'emergency_police' else "[🔔 PORTEIRO]"
-    
-    # Criar notificação para cada um
     message = f"{tag} EMERGÊNCIA ACIONADA por: {current_user.name} ({current_user.unit_block} - {current_user.unit_number})"
+
+    # Buscar usuários com cargo de admin/síndico/porteiro via ROLE OBJECT (novo sistema)
+    staff_via_role = User.query.join(Role, User.role_id == Role.id).filter(
+        Role.name.in_(['Síndico', 'Sindico', 'Porteiro', 'Admin'])
+    ).all()
     
+    # Também buscar via role string (sistema legado) para garantir compatibilidade
+    staff_via_string = User.query.filter(
+        User.role.in_(['admin', 'porteiro', 'sindico'])
+    ).all()
+    
+    # Unir as duas listas sem duplicatas
+    staff_ids = {u.id for u in staff_via_role} | {u.id for u in staff_via_string}
+    users_to_alert = [u for u in (staff_via_role + staff_via_string) if u.id in staff_ids]
+    # Remover duplicatas
+    seen = set()
+    unique_staff = []
     for u in users_to_alert:
-        # Não enviar para si mesmo (caso o porteiro aperte, os outros recebem)
+        if u.id not in seen:
+            seen.add(u.id)
+            unique_staff.append(u)
+
+    notified = 0
+    for u in unique_staff:
         if u.id != current_user.id:
             notif = Notification(
-                user_id=u.id, 
-                message=message, 
+                user_id=u.id,
+                message=message,
                 notification_type=emergency_type
             )
             db.session.add(notif)
-            
-            # Tentar enviar push (se configurado)
             send_web_push(u.id, message)
-            
+            notified += 1
+
     db.session.commit()
-    return jsonify({'success': True, 'message': 'Alerta de emergência enviado!'})
+    
+    if notified == 0:
+        return jsonify({'success': True, 'message': 'Alerta registrado. Nenhuma equipe encontrada no sistema para notificar.'})
+    
+    return jsonify({'success': True, 'message': f'Alerta de emergência enviado para {notified} pessoa(s)!'})
+
 
 @notifications_bp.route('/check_emergency', methods=['GET'])
 @login_required
