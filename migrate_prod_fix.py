@@ -45,12 +45,18 @@ def migrate():
         add_column('notice', 'image_filename', 'VARCHAR(255)')
         add_column('notice', 'is_important', 'BOOLEAN DEFAULT FALSE')
         add_column('notice', 'condo_id', 'INTEGER REFERENCES condominium(id)')
+        add_column('notice', 'created_by', 'INTEGER REFERENCES "user"(id)')
+        add_column('notice', 'created_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
         
         # 4. Atualizar tabela 'payment' e 'expense' (Financeiro)
         add_column('payment', 'unit_id', 'INTEGER REFERENCES unit(id)')
         add_column('payment', 'condo_id', 'INTEGER REFERENCES condominium(id)')
+        add_column('payment', 'created_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
+        
         add_column('expense', 'proof_filename', 'VARCHAR(255)')
         add_column('expense', 'condo_id', 'INTEGER REFERENCES condominium(id)')
+        add_column('expense', 'created_by', 'INTEGER REFERENCES "user"(id)')
+        add_column('expense', 'created_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
         
         # 5. Atualizar tabela 'unit'
         add_column('unit', 'condo_id', 'INTEGER REFERENCES condominium(id)')

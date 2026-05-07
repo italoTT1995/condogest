@@ -111,6 +111,28 @@ class User(UserMixin, db.Model):
             return self.user_role.name in ['Morador', 'Síndico', 'Sindico', 'Admin']
         return self.role.lower() in ['resident', 'admin', 'morador', 'síndico']
 
+    @property
+    def name(self):
+        return self.full_name or self.username
+
+    @property
+    def unit_block(self):
+        if self.unit:
+            return self.unit.block
+        return "N/A"
+
+    @property
+    def unit_number(self):
+        if self.unit:
+            return self.unit.number
+        return "N/A"
+
+    @property
+    def apartment(self):
+        if self.unit:
+            return f"{self.unit.block} - {self.unit.number}"
+        return "N/A"
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
