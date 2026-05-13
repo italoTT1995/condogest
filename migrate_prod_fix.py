@@ -72,6 +72,26 @@ def migrate():
         add_column('reservation', 'access_token', 'VARCHAR(100)')
         add_column('common_area', 'condo_id', 'INTEGER REFERENCES condominium(id)')
 
+        # 8. Atualizar tabela 'visit_log' (Portaria/Visitas)
+        add_column('visit_log', 'status', "VARCHAR(20) DEFAULT 'active'")
+        add_column('visit_log', 'condo_id', 'INTEGER REFERENCES condominium(id)')
+        add_column('visit_log', 'expected_arrival', 'TIMESTAMP')
+        add_column('visit_log', 'scheduled_by', 'INTEGER REFERENCES "user"(id)')
+        add_column('visit_log', 'user_id', 'INTEGER REFERENCES "user"(id)')
+        add_column('visit_log', 'access_status', 'VARCHAR(20)')
+        add_column('visit_log', 'failure_reason', 'VARCHAR(100)')
+        add_column('visit_log', 'observation', 'VARCHAR(200)')
+        
+        # Atualizar registros antigos sem status para 'active'
+        try:
+            with engine.connect() as conn:
+                conn.execute(text("UPDATE visit_log SET status = 'active' WHERE status IS NULL"))
+                conn.commit()
+                print("Visitas antigas sem status atualizadas para 'active'.")
+        except Exception as e:
+            print(f"Nota ao atualizar status de visitas: {e}")
+
+
         # 8. Garantir Roles básicas se não existirem
         from app.models.user import Role
         roles = [

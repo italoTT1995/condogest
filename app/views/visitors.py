@@ -11,24 +11,36 @@ visitors_bp = Blueprint('visitors', __name__)
 @login_required
 def index():
     from flask import session
-    condo_id = session.get('active_condo_id') # Filter context
+    condo_id = session.get('active_condo_id')
     
-    # Active visits: Log entries where exit_time is None AND condo_id matches
-    active_visits = VisitLog.query.filter_by(condo_id=condo_id, status='active', exit_time=None).order_by(VisitLog.entry_time.desc()).all()
-    
-    # Scheduled visits (Pre-authorized)
-    scheduled_visits = VisitLog.query.filter_by(condo_id=condo_id, status='scheduled').order_by(VisitLog.expected_arrival).all()
-    
-    # History: Log entries where exit_time is NOT None (Limit 50 for now)
-    history_visits = VisitLog.query.filter(VisitLog.condo_id == condo_id, VisitLog.exit_time != None).order_by(VisitLog.entry_time.desc()).limit(50).all()
+    try:
+        if condo_id:
+            # Filtrar por condomínio específico
+            active_visits = VisitLog.query.filter_by(condo_id=condo_id, status='active').filter(VisitLog.exit_time == None).order_by(VisitLog.entry_time.desc()).all()
+            scheduled_visits = VisitLog.query.filter_by(condo_id=condo_id, status='scheduled').order_by(VisitLog.expected_arrival).all()
+            history_visits = VisitLog.query.filter(VisitLog.condo_id == condo_id, VisitLog.exit_time != None).order_by(VisitLog.entry_time.desc()).limit(50).all()
+        else:
+            # Fallback: mostrar todas as visitas se condo_id não estiver na sessão
+            active_visits = VisitLog.query.filter_by(status='active').filter(VisitLog.exit_time == None).order_by(VisitLog.entry_time.desc()).all()
+            scheduled_visits = VisitLog.query.filter_by(status='scheduled').order_by(VisitLog.expected_arrival).all()
+            history_visits = VisitLog.query.filter(VisitLog.exit_time != None).order_by(VisitLog.entry_time.desc()).limit(50).all()
+    except Exception as e:
+        # Fallback se colunas novas não existirem (ex: status, condo_id)
+        try:
+            active_visits = VisitLog.query.filter(VisitLog.exit_time == None).order_by(VisitLog.entry_time.desc()).all()
+        except:
+            active_visits = []
+        scheduled_visits = []
+        history_visits = []
+        flash(f'Aviso: banco de dados pode precisar de atualização. ({str(e)[:80]})', 'warning')
 
-    # Dashboard Stats
     today = datetime.now().date()
-    visits_today = VisitLog.query.filter(
-        VisitLog.condo_id == condo_id,
-        db.func.date(VisitLog.entry_time) == today,
-        VisitLog.status != 'scheduled' 
-    ).count()
+    try:
+        visits_today = VisitLog.query.filter(
+            db.func.date(VisitLog.entry_time) == today
+        ).count()
+    except:
+        visits_today = 0
     
     active_count = len(active_visits)
     scheduled_count = len(scheduled_visits)
@@ -42,6 +54,7 @@ def index():
                                'today': visits_today,
                                'scheduled': scheduled_count
                            })
+
 
 @visitors_bp.route('/activate/<int:id>', methods=['POST'])
 @login_required
@@ -83,15 +96,15 @@ def new_visit():
             db.session.commit() # Commit to get ID
         
         # 2. Log Entry
-        try:
             from flask import session
-            
+            condo_id = session.get('active_condo_id')
             new_log = VisitLog(
                 visitor_id=visitor.id,
                 unit_id=int(unit_id),
                 observation=observation,
-                condo_id=session.get('active_condo_id'),
-                entry_time=datetime.now()
+                condo_id=condo_id,
+                entry_time=datetime.now(),
+                status='active'  # Explícito para garantir que aparece na listagem
             )
             db.session.add(new_log)
             db.session.commit()
