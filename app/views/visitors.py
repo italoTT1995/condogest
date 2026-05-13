@@ -96,6 +96,7 @@ def new_visit():
             db.session.commit() # Commit to get ID
         
         # 2. Log Entry
+        try:
             from flask import session
             condo_id = session.get('active_condo_id')
             new_log = VisitLog(
@@ -114,6 +115,7 @@ def new_visit():
             flash(f'Erro ao registrar entrada: {str(e)}', 'danger')
             return redirect(url_for('visitors.new_visit'))
         return redirect(url_for('visitors.index'))
+
 
     # GET: Show form
     from flask import session
