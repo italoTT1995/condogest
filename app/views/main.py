@@ -58,6 +58,41 @@ def debug_error():
 
     return jsonify(errors)
 
+@main_bp.route('/debug/login_test')
+def debug_login_test():
+    """Diagnóstico específico para problemas de login."""
+    from flask import jsonify
+    from app import db
+    from app.models.user import User
+    results = {}
+    test_emails = ['admin@system.com', 'sindico@system.com', 'porteiro@system.com', 'morador@system.com']
+    users_found = []
+    for email in test_emails:
+        try:
+            u = User.query.filter_by(email=email).first()
+            if u:
+                try:
+                    condo = u.condominium
+                    condo_name = condo.name if condo else 'Sem condominio'
+                except Exception as e:
+                    condo_name = f'ERRO: {str(e)}'
+                pw_ok = u.check_password('admin123') if email == 'admin@system.com' else None
+                users_found.append({
+                    'email': email, 'username': u.username,
+                    'role': u.role, 'user_role': u.user_role.name if u.user_role else None,
+                    'condo_id': u.condo_id, 'condominio': condo_name,
+                    'locked': str(u.locked_until) if u.locked_until else None,
+                    'must_change_pw': u.must_change_password,
+                    'failed_attempts': u.failed_login_attempts,
+                    'password_ok': pw_ok
+                })
+            else:
+                users_found.append({'email': email, 'status': 'NAO ENCONTRADO'})
+        except Exception as e:
+            users_found.append({'email': email, 'error': str(e)})
+    results['users'] = users_found
+    return jsonify(results)
+
 
 @main_bp.route('/presentation')
 def landing():
