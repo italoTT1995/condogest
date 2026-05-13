@@ -192,17 +192,22 @@ def pre_authorize():
          db.session.commit()
 
     # Create Scheduled Log
+    from flask import session
+    condo_id = session.get('active_condo_id') or current_user.condo_id
+    
     log = VisitLog(
         visitor_id=visitor.id,
-        unit_id=current_user.unit_id, # Assuming resident has unit
+        unit_id=current_user.unit_id,
         expected_arrival=arrival_dt,
         status='scheduled',
         scheduled_by=current_user.id,
-        entry_time=None # Explicitly None
+        condo_id=condo_id,  # ← ESSENCIAL para o porteiro encontrar a visita
+        entry_time=None
     )
     db.session.add(log)
     db.session.commit()
     flash('Visitante pré-autorizado com sucesso!', 'success')
+
     return redirect(url_for('visitors.my_guests'))
 
 @visitors_bp.route('/cancel_visit/<int:id>', methods=['POST'])
