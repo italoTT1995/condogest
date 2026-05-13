@@ -11,9 +11,15 @@ def index():
     if not current_user.is_resident:
          flash('Acesso exclusivo para moradores.', 'warning')
          return redirect(url_for('main.index'))
+
+    from flask import session
+    condo_id = session.get('active_condo_id')
          
-    # List my active/inactive providers
-    providers = ServiceProvider.query.filter_by(user_id=current_user.id).order_by(ServiceProvider.name).all()
+    # List my active/inactive providers (only from my condo)
+    providers = ServiceProvider.query.filter_by(
+        user_id=current_user.id,
+        condo_id=condo_id
+    ).order_by(ServiceProvider.name).all()
     
     return render_template('services/my_providers.html', providers=providers)
 
