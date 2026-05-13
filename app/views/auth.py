@@ -68,9 +68,23 @@ def login():
             session['active_condo_id'] = user.condo_id
             session['active_condo_name'] = user.condominium.name
         else:
-            # Fallback for old users or error state
-            session['active_condo_id'] = 1
-            session['active_condo_name'] = 'Residencial Sunset'
+            # Busca o primeiro condomínio real do banco (sem fallback hardcoded)
+            try:
+                from app.models.condominium import Condominium
+                condo = Condominium.query.order_by(Condominium.id).first()
+                if condo:
+                    session['active_condo_id'] = condo.id
+                    session['active_condo_name'] = condo.name
+                    # Atualiza o condo_id do usuário para futuras sessões
+                    user.condo_id = condo.id
+                    db.session.commit()
+                else:
+                    session['active_condo_id'] = None
+                    session['active_condo_name'] = 'Condomínio'
+            except Exception:
+                session['active_condo_id'] = None
+                session['active_condo_name'] = 'Condomínio'
+
             
         next_page = request.args.get('next')
         return redirect(next_page or url_for('main.index'))

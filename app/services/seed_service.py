@@ -116,8 +116,23 @@ def seed_default_users():
         })
         
     db.session.commit()
-    
-    # Imprimir credenciais no terminal para o usuário ver
+
+    # Vincular todos os usuários padrão ao primeiro condomínio real do banco
+    try:
+        from app.models.condominium import Condominium
+        condo = Condominium.query.order_by(Condominium.id).first()
+        if condo:
+            for username in PROTECTED_USERS.keys():
+                user = User.query.filter_by(username=username).first()
+                if user and user.condo_id != condo.id:
+                    user.condo_id = condo.id
+                    logger.info(f"Usuário {username} vinculado ao condomínio: {condo.name}")
+            db.session.commit()
+        else:
+            logger.warning("Nenhum condomínio encontrado no banco. Usuários sem condo_id.")
+    except Exception as e:
+        logger.error(f"Erro ao vincular usuários ao condomínio: {e}")
+
     print("\n" + "="*50)
     print("CREDENCIAIS DOS USUÁRIOS PADRÃO (Para demonstração):")
     for cred in generated_credentials:
