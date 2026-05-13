@@ -183,8 +183,6 @@
         {% else %}
         <div class="mt-2 text-center text-muted small">
           <i class="bi bi-building me-1"></i> {{ session.get('active_condo_name', 'Seu Condomínio') }}
-          <br><span style="font-size: 8px;">Role: {{ current_user.user_role.name if current_user.user_role else
-            current_user.role }} ({{ current_user.is_admin }})</span>
         </div>
         {% endif %}
       </div>
@@ -283,26 +281,30 @@
         </li>
         {% endif %}
 
-        <!-- Comunicados -->
+        <!-- Comunicados (oculto para Porteiro) -->
+        {% if not current_user.is_porteiro %}
         <li class="{% if request.endpoint == 'notices.index' %}active{% endif %}">
           <a href="{{ url_for('notices.index') }}">
             <i class="bi bi-megaphone"></i> Comunicados
           </a>
         </li>
+        {% endif %}
 
+        {% if not current_user.is_porteiro %}
         <li class="{% if request.endpoint == 'assemblies.index' %}active{% endif %}">
           <a href="{{ url_for('assemblies.index') }}">
             <i class="bi bi-calendar3"></i> Assembleias
           </a>
         </li>
+        {% endif %}
 
+        {% if not current_user.is_porteiro %}
         <li class="{% if request.endpoint == 'documents.index' %}active{% endif %}">
           <a href="{{ url_for('documents.index') }}">
             <i class="bi bi-folder"></i> Documentos
           </a>
         </li>
-
-
+        {% endif %}
 
         {% if current_user.is_porteiro %}
         <li class="{% if request.endpoint == 'vehicles.index' %}active{% endif %}">
