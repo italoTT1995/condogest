@@ -331,6 +331,149 @@
 </div>
 {% endif %}
 
+{% if current_user.is_porteiro %}
+<!-- Dashboard Mobile do Porteiro -->
+<div class="d-md-none">
+    <!-- Cabeçalho do Porteiro -->
+    <div class="profile-header-gradient mb-0">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow"
+                    style="width: 56px; height: 56px; flex-shrink: 0;">
+                    <i class="bi bi-shield-check text-primary" style="font-size: 1.8rem;"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold">Olá, {{ current_user.username }}</h5>
+                    <small class="opacity-75">🔵 Plantão ativo</small>
+                </div>
+            </div>
+            <a href="{{ url_for('auth.profile') }}" class="btn btn-sm btn-light rounded-pill px-3 fw-bold shadow-sm">Perfil</a>
+        </div>
+    </div>
+
+    <!-- Stats Rápidas do Porteiro -->
+    <div class="stats-bar-mobile mb-4">
+        <div class="stats-item-mobile">
+            <h5>{{ visitor_stats.get('active', 0) if visitor_stats else 0 }}</h5>
+            <small>Na portaria</small>
+        </div>
+        <div class="stats-item-mobile">
+            <h5>{{ visitor_stats.get('today', 0) if visitor_stats else 0 }}</h5>
+            <small>Hoje</small>
+        </div>
+        <div class="stats-item-mobile">
+            <h5>{{ visitor_stats.get('scheduled', 0) if visitor_stats else 0 }}</h5>
+            <small>Agendados</small>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas do Porteiro -->
+    <h5 class="shots-title mb-3 fw-bold">Ações Rápidas</h5>
+    <div class="shots-grid mb-4" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+        <a href="{{ url_for('visitors.index') }}" class="shot-card">
+            <div class="shot-icon-wrapper" style="color: #4318FF; background: rgba(67,24,255,0.1);">
+                <i class="bi bi-door-open"></i>
+            </div>
+            <small>Portaria</small>
+        </a>
+        <a href="{{ url_for('access.scan') }}" class="shot-card">
+            <div class="shot-icon-wrapper" style="color: #2ECC71; background: rgba(46,204,113,0.1);">
+                <i class="bi bi-qr-code-scan"></i>
+            </div>
+            <small>Leitor QR</small>
+        </a>
+        <a href="{{ url_for('deliveries.index') }}" class="shot-card">
+            <div class="shot-icon-wrapper" style="color: #F1C40F; background: rgba(241,196,15,0.1);">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <small>Entregas</small>
+        </a>
+        <a href="{{ url_for('vehicles.index') }}" class="shot-card">
+            <div class="shot-icon-wrapper" style="color: #3498DB; background: rgba(52,152,219,0.1);">
+                <i class="bi bi-car-front"></i>
+            </div>
+            <small>Veículos</small>
+        </a>
+        <a href="{{ url_for('lost_found.index') }}" class="shot-card">
+            <div class="shot-icon-wrapper" style="color: #E67E22; background: rgba(230,126,34,0.1);">
+                <i class="bi bi-search"></i>
+            </div>
+            <small>Achados</small>
+        </a>
+        <a href="{{ url_for('tickets.index') }}" class="shot-card">
+            <div class="shot-icon-wrapper" style="color: #9B59B6; background: rgba(155,89,182,0.1);">
+                <i class="bi bi-journal-text"></i>
+            </div>
+            <small>Chamados</small>
+        </a>
+        <a href="{{ url_for('access.history') }}" class="shot-card">
+            <div class="shot-icon-wrapper" style="color: #E74C3C; background: rgba(231,76,60,0.1);">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <small>Histórico</small>
+        </a>
+        <a href="{{ url_for('services.search') }}" class="shot-card">
+            <div class="shot-icon-wrapper" style="color: #7F8C8D; background: rgba(127,140,141,0.1);">
+                <i class="bi bi-person-badge-fill"></i>
+            </div>
+            <small>Prestadores</small>
+        </a>
+    </div>
+
+    <!-- Visitantes Ativos -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="shots-title mb-0 fw-bold">Visitantes Ativos</h6>
+        <a href="{{ url_for('visitors.index') }}" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none">Ver Todos</a>
+    </div>
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-3">
+            {% if visitor_stats and visitor_stats.get('active', 0) > 0 %}
+            <div class="d-flex align-items-center gap-3 p-2">
+                <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">{{ visitor_stats.get('active', 0) }} visitante(s) no condomínio</h6>
+                    <small class="text-muted">{{ visitor_stats.get('today', 0) }} entradas hoje</small>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-3">
+                <i class="bi bi-door-closed fs-2 d-block mb-2 opacity-25"></i>
+                <small>Nenhum visitante ativo no momento</small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Atividade Recente -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="shots-title mb-0 fw-bold">Avisos do Condomínio</h6>
+        <a href="{{ url_for('tickets.index') }}" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none">Ver Chamados</a>
+    </div>
+    <div class="list-group list-group-flush rounded-4 overflow-hidden shadow-sm mb-5">
+        {% if recent_notices %}
+        {% for notice in recent_notices[:3] %}
+        <div class="list-group-item border-0 px-3 py-3 d-flex align-items-center gap-3 bg-white">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                <i class="bi bi-megaphone-fill"></i>
+            </div>
+            <div class="flex-grow-1 overflow-hidden">
+                <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.9rem;">{{ notice.title }}</h6>
+                <small class="text-muted text-truncate d-block">{{ notice.content }}</small>
+            </div>
+            <small class="text-muted" style="font-size: 0.7rem;">{{ notice.created_at.strftime('%d/%m') }}</small>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="list-group-item border-0 p-4 text-center text-muted bg-white">
+            <small>Nenhum aviso recente.</small>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
 <!-- Stats Row (Hero Cards) - Desktop Only -->
 <div class="row g-4 mb-4 d-none d-md-flex">
     <!-- Revenue/Finance Card (Like 'Total Revenue') -->
